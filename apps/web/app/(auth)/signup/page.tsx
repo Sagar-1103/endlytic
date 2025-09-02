@@ -97,7 +97,7 @@ export default function Login() {
   )
 }
 
-export function Card({ title, logo }: { title: string; logo: string | React.ReactNode }) {
+function Card({ title, logo }: { title: string; logo: string | React.ReactNode }) {
   return (
     <button className="flex items-center justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-105 hover:shadow-md active:scale-95">
        {logo}
