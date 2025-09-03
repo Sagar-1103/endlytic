@@ -67,8 +67,8 @@ export default function Header() {
           {/* Brand */}
           <div className="flex flex-row gap-x-1">
             <Image
-              src={"/endlytic.svg"}
-              className="rounded-sm"
+              src={"/endlytic-dark.svg"}
+              className="rounded-sm scale-250"
               alt="logo"
               width={30}
               height={30}
