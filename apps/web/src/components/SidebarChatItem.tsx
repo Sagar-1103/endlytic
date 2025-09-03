@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+import { useChatTitleStore } from "@/store/useStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface SidebarChatItemProps {
   chat: { id: number; title: string };
@@ -8,9 +11,21 @@ export default function SidebarChatItem({
   chat,
   isActive
 }: SidebarChatItemProps) {
+  const { setChatTitle } = useChatTitleStore();
+  const router = useRouter();
+
+  useEffect(()=>{
+    if(isActive) {
+      setChatTitle(chat.title);
+    }
+  },[]);
+  
   return (
-    <Link
-    href={`/chat/${chat.id}`}
+    <div
+    onClick={()=>{
+      router.push(`/chat/${chat.id}`);
+      setChatTitle(chat.title);
+    }}
       className="flex overflow-hidden items-center gap-3 px-3 py-2 rounded-lg pl-[2px] cursor-pointer relative hover:bg-emerald-500/10 transition-all duration-200"
     >
       {isActive && (
@@ -23,6 +38,6 @@ export default function SidebarChatItem({
           {chat.title}
         </p>
       </div>
-    </Link>
+    </div>
   );
 }
