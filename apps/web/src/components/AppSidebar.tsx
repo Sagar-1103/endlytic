@@ -17,11 +17,13 @@ import SidebarItem from "./SidebarItem";
 import SidebarChats from "./SidebarChats";
 import { items } from "@/data/sidebar-data";
 import { usePathname, useRouter } from "next/navigation";
+import { useChatTitleStore } from "@/store/useStore";
 
 export default function AppSidebar() {
 
   const router = useRouter();
   const pathName = usePathname();
+  const { setChatTitle } = useChatTitleStore();
 
   return (
     <Sidebar
@@ -62,6 +64,7 @@ export default function AppSidebar() {
                   <SidebarItem
                     onClick={() => {
                       router.push(item.url);
+                      setChatTitle("Endlytic API Explorer");
                     }}
                     isActive={pathName===item.url}
                     key={index}
