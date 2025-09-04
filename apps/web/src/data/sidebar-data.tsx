@@ -24,15 +24,22 @@ export const items: { title: string; url: string; icon: React.ReactNode }[] = [
   },
 ];
 
-export const chats = [
-  { id: 1, title: "API Documentation" },
-  { id: 2, title: "Code Generation" },
-  { id: 3, title: "API Integrations" },
-  { id: 4, title: "Developer Productivity" },
-  { id: 5, title: "Analytics & Monitoring" },
-  { id: 6, title: "Customization & Features" },
-  { id: 7, title: "API Health Checks" },
-  { id: 8, title: "VS Code Extension" },
-  { id: 9, title: "Slack Integration" },
-  { id: 10, title: "GraphQL Support" },
+export const chats:{id:number,title:string}[] = [
+  { id: 0, title: "API Documentation" },
+  { id: 1, title: "Code Generation" },
+  { id: 2, title: "API Integrations" },
+  { id: 3, title: "Developer Productivity" },
+  { id: 4, title: "Analytics & Monitoring" },
+  { id: 5, title: "Customization & Features" },
+  { id: 6, title: "API Health Checks" },
+  { id: 7, title: "VS Code Extension" },
+  { id: 8, title: "Slack Integration" },
+  { id: 9, title: "GraphQL Support" },
+];
+
+export const collections:{id:number,title:string}[] = [
+  { id: 0, title: "Ecommerce" },
+  { id: 1, title: "DeFi" },
+  { id: 2, title: "AI Chatbot" },
+  { id: 3, title: "Collaborative Docs" },
 ];
