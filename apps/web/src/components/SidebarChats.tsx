@@ -12,7 +12,7 @@ export default function SidebarChats() {
         Recent Chats
       </p>
       <div className="flex flex-col gap-1">
-        {chats.map((chat) => (
+        {chats.length!==0 && chats.map((chat) => (
           <SidebarChatItem isActive={pathName===`/chat/${chat.id}`} key={chat.id} chat={chat} />
         ))}
       </div>
