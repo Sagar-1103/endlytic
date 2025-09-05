@@ -1,7 +1,41 @@
+"use client"
 import Image from "next/image"
-import {GoogleLogo,DiscordLogo,GithubLogo,MicrosoftLogo} from "public/icons";
+import { GoogleLogo, DiscordLogo, GithubLogo, GitlabLogo } from "public/icons";
+import { useSession, signIn, signOut } from "next-auth/react"
+import { useState } from "react";
+import { signUp } from "app/actions/auth";
+import { useRouter } from "next/navigation";
 
-export default function Login() {
+export default function Signup() {
+  const router = useRouter();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error , setError] = useState("");
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+    const signUpResult = await signUp({ email, password });
+
+    if (signUpResult.error) {
+      setError(signUpResult.error)
+      console.log(signUpResult.error)
+      return
+    }
+
+    const signInResult = await signIn("credentials", {
+      email: email,
+      password:password,
+      redirect: false,
+    });
+
+    if (signInResult?.error) {
+      setError(signInResult?.error)
+      console.log(signInResult?.error)
+      return;
+    }
+    router.push("/");
+  }
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row bg-[#191919]">
       <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#000000] via-[#0c3e37] to-[#040505]  px-8 py-12 lg:w-1/3">
@@ -25,10 +59,10 @@ export default function Login() {
 
 
           <div className="mt-3 grid md:grid-cols-1 gap-4">
-            <Card title="Google" logo={<GoogleLogo/>} />
-            <Card title="GitHub" logo={<GithubLogo/>} />
-            <Card title="Discord" logo={<DiscordLogo/>} />
-            <Card title="Microsoft" logo={<MicrosoftLogo/>} />
+            <Card title="Google" logo={<GoogleLogo />} id="google" />
+            <Card title="GitHub" logo={<GithubLogo />} id="github" />
+            <Card title="Discord" logo={<DiscordLogo />} id="discord" />
+            <Card title="GitLab" logo={<GitlabLogo />} id="gitlab" />
           </div>
 
 
@@ -38,7 +72,7 @@ export default function Login() {
             <hr className="flex-1 border-[#DEDEDE]" />
           </div>
 
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -50,6 +84,8 @@ export default function Login() {
                 type="email"
                 id="email"
                 name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="mt-1 w-full rounded-md border border-[#848282] px-3 py-2 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-0 focus:ring-gray-500"
                 placeholder="youremail@email.com"
@@ -67,15 +103,18 @@ export default function Login() {
                 type="password"
                 id="password"
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="mt-1 w-full rounded-md border border-[#848282] px-3 py-2 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
                 placeholder="Enter a unique password"
               />
+              <div className="mt-2 text-red-500">{error}</div>
             </div>
 
             <button
               type="submit"
-              disabled
+              disabled={!email || !password}
               className="w-full rounded-lg bg-[#222222] border cursor-pointer disabled:cursor-not-allowed border-[#575757] py-2 font-medium text-[#DEDEDE] transition disabled:bg-[#575757]"
             >
               Continue
@@ -88,7 +127,7 @@ export default function Login() {
               href="/login"
               className="font-medium text-blue-500 hover:text-blue-400"
             >
-              Log in 
+              Log in
             </a>
           </p>
         </div>
@@ -97,10 +136,13 @@ export default function Login() {
   )
 }
 
-function Card({ title, logo }: { title: string; logo: string | React.ReactNode }) {
+function Card({ title, logo, id }: { title: string; logo: string | React.ReactNode; id: string }) {
   return (
-    <button className="flex items-center justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-105 hover:shadow-md active:scale-95">
-       {logo}
+    <button
+      type="button"
+      onClick={() => signIn(id, { callbackUrl: "/chat" })}
+      className="flex items-center justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-105 hover:shadow-md active:scale-95">
+      {logo}
       <span className="text-sm font-medium">{title}</span>
     </button>
   )

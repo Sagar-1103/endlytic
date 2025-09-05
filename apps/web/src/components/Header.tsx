@@ -6,8 +6,10 @@ import menuAnimation from "../../public/menu-animation.json";
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import LoginButton from "./ui/loginbutton";
 
 export default function Header() {
+
   const navlinks = [
     { id: 1, title: "Features", link: "#features" },
     { id: 2, title: "About", link: "#" },
@@ -93,12 +95,14 @@ export default function Header() {
 
           {/* Buttons  */}
           <div className="my-auto">
-            <Button
+            <LoginButton/>
+            {/* <Button
               className="sm:flex hidden cursor-pointer font-bold text-lg rounded-lg bg-white text-black hover:shadow-[inset_0_0_10px_1px_#ffffff,_0_0_50px_-10px_#00FFA6] hover:text-gray-800 hover:bg-[#00e593] transition-all duration-300 transform"
               variant={"default"}
+              onClick={()=>{router.push("/login")}}
             >
               Login
-            </Button>
+            </Button> */}
             <div
               className="block sm:hidden h-10 w-10"
               onClick={handleMenuClick}

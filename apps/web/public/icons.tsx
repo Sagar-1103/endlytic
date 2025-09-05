@@ -17,10 +17,8 @@ export function GithubLogo() {
     )
 }
 
-export function MicrosoftLogo() {
-    return (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 439 439" role="img" aria-hidden="true" width="16px" height="16px"><path fill="#f3f3f3" d="M0 0h439v439H0z"></path>
-    <path fill="#F35325" d="M17 17h194v194H17z"></path><path fill="#81BC06" d="M228 17h194v194H228z"></path>
-    <path fill="#05A6F0" d="M17 228h194v194H17z"></path><path fill="#FFBA08" d="M228 228h194v194H228z"></path></svg>
+export function GitlabLogo() {
+    return (<svg fill="none" viewBox="0 0 32 32" height={"18px"} width={"18px"} className="slp-icon slp-icon slp-icon--size-lg slp-icon--color-color-text-300" role="img" aria-hidden="true" data-icon-name="" aria-id="tanukiHomeDesktop" data-v-c3411281="" data-v-1fc80711=""><path fill="#E24329" d="M31.462 12.779l-.045-.115-4.35-11.35a1.137 1.137 0 00-.447-.541 1.163 1.163 0 00-1.343.071c-.187.15-.322.356-.386.587l-2.94 9.001h-11.9l-2.941-9a1.138 1.138 0 00-1.045-.84 1.153 1.153 0 00-1.13.72L.579 12.68l-.045.113a8.09 8.09 0 002.68 9.34l.016.012.038.03 6.635 4.967 3.28 2.484 1.994 1.51a1.35 1.35 0 001.627 0l1.994-1.51 3.282-2.484 6.673-4.997.018-.013a8.088 8.088 0 002.69-9.352z"></path><path fill="#FC6D26" d="M31.462 12.779l-.045-.115a14.748 14.748 0 00-5.856 2.634l-9.553 7.24A11225.6 11225.6 0 0022.1 27.14l6.673-4.997.019-.013a8.09 8.09 0 002.67-9.352z"></path><path fill="#FCA326" d="M9.908 27.14l3.275 2.485 1.994 1.51a1.35 1.35 0 001.627 0l1.994-1.51 3.282-2.484s-2.835-2.14-6.092-4.603l-6.08 4.603z"></path><path fill="#FC6D26" d="M6.435 15.305A14.712 14.712 0 00.58 12.672l-.045.113a8.09 8.09 0 002.68 9.347l.016.012.038.03 6.635 4.967 6.105-4.603-9.573-7.233z"></path></svg>
     )
 }
 
