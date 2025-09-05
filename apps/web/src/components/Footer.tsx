@@ -18,12 +18,14 @@ export default function Footer() {
           answers.
         </p>
         <div className="flex flex-row gap-x-4 z-30 justify-center mb-20">
+          <Link href={"/login"}>
           <Button
             className="cursor-pointer rounded-xl py-5 px-8 font-bold text-md md:text-lg text-gray-800 shadow-[inset_0_0_10px_1px_#ffffff] hover:shadow-[inset_0_0_10px_1px_#ffffff,_0_0_50px_-10px_#00FFA6] hover:bg-[#00e593] bg-[#00e593] transition-all duration-300 transform"
             variant={"default"}
           >
             Try Endlytic
           </Button>
+          </Link>
         </div>
       </div>
 
