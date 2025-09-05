@@ -27,20 +27,6 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row bg-[#191919]">
-      <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#000000] via-[#0c3e37] to-[#040505] px-8 py-12 lg:w-1/3">
-        <Image
-          src="/endlytic.svg"
-          alt="Endlytic Logo"
-          width={50}
-          height={50}
-          priority
-        />
-        <h1 className="mt-6 text-2xl font-semibold text-white text-center">
-          Setup Your Endlytic Account
-        </h1>
-      </div>
-
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-white">
         <div className="w-full max-w-sm">
 
@@ -122,7 +108,6 @@ export default function Login() {
           </p>
         </div>
       </div>
-    </div>
   )
 }
 
