@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Play } from "lucide-react";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -26,12 +27,14 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-row gap-x-4 justify-center mb-20">
-            <Button
-              className="cursor-pointer rounded-xl py-5 font-bold text-md md:text-lg text-gray-800 shadow-[inset_0_0_10px_1px_#ffffff] hover:shadow-[inset_0_0_10px_1px_#ffffff,_0_0_50px_-10px_#00FFA6] hover:bg-[#00e593] bg-[#00e593] transition-all duration-300 transform"
-              variant={"default"}
-            >
-              Try Endlytic
-            </Button>
+            <Link href={"/login"}>
+              <Button
+                className="cursor-pointer rounded-xl py-5 font-bold text-md md:text-lg text-gray-800 shadow-[inset_0_0_10px_1px_#ffffff] hover:shadow-[inset_0_0_10px_1px_#ffffff,_0_0_50px_-10px_#00FFA6] hover:bg-[#00e593] bg-[#00e593] transition-all duration-300 transform"
+                variant={"default"}
+              >
+                Try Endlytic
+              </Button>
+            </Link>
           </div>
 
           <div className="relative w-full sm:w-[95%] md:w-[95%] lg:w-[95%] mx-auto">

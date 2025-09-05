@@ -18,12 +18,33 @@ import SidebarChats from "./SidebarChats";
 import { items } from "@/data/sidebar-data";
 import { usePathname, useRouter } from "next/navigation";
 import { useChatTitleStore } from "@/store/useStore";
+import { getSession, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 export default function AppSidebar() {
-
   const router = useRouter();
   const pathName = usePathname();
   const { setChatTitle } = useChatTitleStore();
+  const [user, setUser] = useState({ email: "", name: "", image: "" });
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout");
+    signOut({ callbackUrl: "/" });
+  };
+
+  const getUser = async () => {
+    const session = await getSession();
+    if (!session) return;
+    setUser({
+      name: session.user.name ?? "",
+      email: session.user.email ?? "",
+      image: session.user.image ?? "",
+    });
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   return (
     <Sidebar
@@ -66,7 +87,7 @@ export default function AppSidebar() {
                       router.push(item.url);
                       setChatTitle("Endlytic API Explorer");
                     }}
-                    isActive={pathName===item.url}
+                    isActive={pathName === item.url}
                     key={index}
                     item={item}
                   />
@@ -79,23 +100,36 @@ export default function AppSidebar() {
         </div>
 
         <SidebarFooter className="p-0">
-          <div className="p-3 border-t border-emerald-900/20 bg-gradient-to-r from-[#0d1210] to-[#0a0f0d]">
+          <div
+            onClick={handleLogout}
+            className="p-3 border-t border-emerald-900/20 bg-gradient-to-r from-[#0d1210] to-[#0a0f0d]"
+          >
             <div className="p-3 flex items-center gap-3 hover:bg-emerald-500/10 rounded-xl transition-all duration-300 cursor-pointer group/footer border border-transparent hover:border-emerald-500/20">
               <div className="relative">
-                <Image
-                  src="/endlytic.svg"
-                  alt="User Avatar"
-                  width={36}
-                  height={36}
-                  className="rounded-full ring-2 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300"
-                />
+                {user.image ? (
+                  <Image
+                    src={user.image || "/endlytic.svg"}
+                    alt="User Avatar"
+                    width={36}
+                    height={36}
+                    className="rounded-full ring-2 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300"
+                  />
+                ) : (
+                  <div className="rounded-full ring-2 w-7 h-7 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300">
+                    <p className="m-auto capitalize text-center">
+                      {user.email?.charAt(0)}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col flex-1">
                 <p className="text-sm font-medium text-slate-200 group-hover/footer:text-emerald-100 transition-colors duration-300">
-                  Name
+                  {user.name.length !== 0
+                    ? user.name.split(" ")[0]
+                    : user.email.split("@")[0]}
                 </p>
-                <p className="text-xs text-slate-400 group-hover/footer:text-emerald-400 transition-colors duration-300">
-                  email@gmail.com
+                <p className="text-xs truncate w-24 text-slate-400 group-hover/footer:text-emerald-400 transition-colors duration-300">
+                  {user.email}
                 </p>
               </div>
               <Settings className="w-4 h-4 text-slate-400 group-hover/footer:text-emerald-300 transition-all duration-300 group-hover/footer:rotate-90" />
