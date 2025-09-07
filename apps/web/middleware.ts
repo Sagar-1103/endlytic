@@ -1,7 +1,6 @@
 // import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
-
-const AUTH_REQUIRED_PATHS = ["/chat"];
+const AUTH_REQUIRED_PATHS = ["/chat", "/collections", "/integrations", "/chats"];
 const NO_AUTH_PATHS = ["/", "/login", "/signup"];
 
 export async function middleware(req: NextRequest) {
@@ -13,22 +12,23 @@ export async function middleware(req: NextRequest) {
   const isAuthenticated = Boolean(customToken);
 
   // Redirect when logged in
-  if (isAuthenticated && NO_AUTH_PATHS.some((p) => pathname.startsWith(p))) {
-    if (pathname !== "/chat") {
-      return NextResponse.redirect(new URL("/chat", req.url));
-    }
+  if (isAuthenticated && NO_AUTH_PATHS.includes(pathname)) {
+    return NextResponse.redirect(new URL("/chat", req.url));
   }
 
   // Redirect when not logged in
   if (!isAuthenticated && AUTH_REQUIRED_PATHS.some((p) => pathname.startsWith(p))) {
-    if (pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   // Redirect when no logged in and trying to access some other random route
-    if (!isAuthenticated && !NO_AUTH_PATHS.includes(pathname)) {
+  if (!isAuthenticated && !NO_AUTH_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  // Redirect when logged in and trying to access some other random route
+  if (isAuthenticated && !AUTH_REQUIRED_PATHS.some((p) => pathname.startsWith(p))) {
+    return NextResponse.redirect(new URL("/chat", req.url));
   }
 
   return NextResponse.next();

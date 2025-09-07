@@ -10,7 +10,6 @@ import bcrypt from "bcryptjs"
 import { importJWK, JWTPayload, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import prismaClient from "./db";
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
 declare module "next-auth" {
   interface Session {

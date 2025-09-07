@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package media;
+
+service MediaService {
+    rpc GetPresignedUrl (GetPresignedUrlRequest) returns (GetPresignedUrlResponse);
+    rpc MediaUploaded (MediaUploadedRequest) returns (MediaUploadedResponse);
+}
+
+message GetPresignedUrlRequest {
+    string fileName = 1;
+    string fileType = 2;
+}
+
+message GetPresignedUrlResponse {
+    string url = 1;
+    string message = 2;
+}
+
+message MediaUploadedRequest {
+    string url = 1;
+}
+
+message MediaUploadedResponse {
+    string message = 2;
+}
