@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
-    "@grpc/proto-loader": "^0.8.0"
+    "@grpc/proto-loader": "^0.8.0",
+    "aws-sdk": "^2.1692.0",
+    "dotenv": "^17.2.2"
   }
 }

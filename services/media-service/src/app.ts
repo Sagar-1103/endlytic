@@ -1,4 +1,5 @@
 import * as grpc from "@grpc/grpc-js";
+import { s3, BUCKET_NAME } from "./config/aws";
 import {
   GetPresignedUrlRequest,
   GetPresignedUrlResponse,
@@ -24,10 +25,16 @@ export const getPresignedUrl = async (
     }
 
     // Generate the presigned url.
+     const url = await s3.getSignedUrlPromise("putObject", {
+        Bucket: BUCKET_NAME,
+        Key: fileName,
+        ContentType: fileType,
+        Expires: 120, 
+      });
 
     const response: GetPresignedUrlResponse = {
       message: "Presigned url generated successfully",
-      url: "https://endlytic.vercel.app",
+      url: url,
     };
 
     return cb(null, response);
