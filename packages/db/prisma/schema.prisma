@@ -13,4 +13,14 @@ model User {
   name  String?
   image String?
   password String?
+  collection Collection[]
+}
+
+model Collection {
+  id          String @id @default(uuid())
+  title       String
+  description String?
+  authorId    String
+  createdAt   DateTime @default(now())
+  user      User     @relation(fields: [authorId], references: [id])
 }
