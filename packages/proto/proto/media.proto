@@ -18,7 +18,8 @@ message GetPresignedUrlResponse {
 }
 
 message MediaUploadedRequest {
-    string url = 1;
+    string fileName = 1;
+    string authorId = 2;
 }
 
 message MediaUploadedResponse {

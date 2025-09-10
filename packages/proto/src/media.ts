@@ -32,7 +32,8 @@ export interface GetPresignedUrlResponse {
 }
 
 export interface MediaUploadedRequest {
-  url: string;
+  fileName: string;
+  authorId: string;
 }
 
 export interface MediaUploadedResponse {
@@ -192,13 +193,16 @@ export const GetPresignedUrlResponse: MessageFns<GetPresignedUrlResponse> = {
 };
 
 function createBaseMediaUploadedRequest(): MediaUploadedRequest {
-  return { url: "" };
+  return { fileName: "", authorId: "" };
 }
 
 export const MediaUploadedRequest: MessageFns<MediaUploadedRequest> = {
   encode(message: MediaUploadedRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.url !== "") {
-      writer.uint32(10).string(message.url);
+    if (message.fileName !== "") {
+      writer.uint32(10).string(message.fileName);
+    }
+    if (message.authorId !== "") {
+      writer.uint32(18).string(message.authorId);
     }
     return writer;
   },
@@ -215,7 +219,15 @@ export const MediaUploadedRequest: MessageFns<MediaUploadedRequest> = {
             break;
           }
 
-          message.url = reader.string();
+          message.fileName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.authorId = reader.string();
           continue;
         }
       }
@@ -228,13 +240,19 @@ export const MediaUploadedRequest: MessageFns<MediaUploadedRequest> = {
   },
 
   fromJSON(object: any): MediaUploadedRequest {
-    return { url: isSet(object.url) ? globalThis.String(object.url) : "" };
+    return {
+      fileName: isSet(object.fileName) ? globalThis.String(object.fileName) : "",
+      authorId: isSet(object.authorId) ? globalThis.String(object.authorId) : "",
+    };
   },
 
   toJSON(message: MediaUploadedRequest): unknown {
     const obj: any = {};
-    if (message.url !== "") {
-      obj.url = message.url;
+    if (message.fileName !== "") {
+      obj.fileName = message.fileName;
+    }
+    if (message.authorId !== "") {
+      obj.authorId = message.authorId;
     }
     return obj;
   },
@@ -244,7 +262,8 @@ export const MediaUploadedRequest: MessageFns<MediaUploadedRequest> = {
   },
   fromPartial<I extends Exact<DeepPartial<MediaUploadedRequest>, I>>(object: I): MediaUploadedRequest {
     const message = createBaseMediaUploadedRequest();
-    message.url = object.url ?? "";
+    message.fileName = object.fileName ?? "";
+    message.authorId = object.authorId ?? "";
     return message;
   },
 };

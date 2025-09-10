@@ -16,7 +16,7 @@ export {};
 
 export const authenticate = async(req:Request,res:Response,next:NextFunction) => {
     try {
-        const token = req.cookies?.accessToken || req.body.token || req.header("Authorization")?.replace("Bearer ", "");
+        const token = req.cookies?.accessToken || req.body?.token || req.header("Authorization")?.replace("Bearer ", "");
 
         if (!token) {
           return res.status(401).json({success:false,message:"Unauthorized request"});

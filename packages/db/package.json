@@ -6,7 +6,8 @@
     "./client": "./src/index.ts"
   },
   "scripts": {
-    "build": "npx prisma generate"
+    "build": "npx prisma generate",
+    "studio": "npx prisma studio"
   },
   "keywords": [],
   "author": "",

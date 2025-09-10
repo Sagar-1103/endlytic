@@ -36,10 +36,3 @@ export const chats:{id:number,title:string}[] = [
   { id: 8, title: "Slack Integration" },
   { id: 9, title: "GraphQL Support" },
 ];
-
-export const collections:{id:number,title:string}[] = [
-  { id: 0, title: "Ecommerce" },
-  { id: 1, title: "DeFi" },
-  { id: 2, title: "AI Chatbot" },
-  { id: 3, title: "Collaborative Docs" },
-];

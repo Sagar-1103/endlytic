@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { ArrowUpCircle, Mic, Paperclip } from "lucide-react";
 import RadioGroup from "./CollectionRadioGroup";
+import { UploadDialog } from "./UploadDialog";
 
 export default function ChatBox() {
   const [chatInput, setChatInput] = useState("");
@@ -25,9 +26,11 @@ export default function ChatBox() {
         />
 
         <div className="flex justify-between items-center mt-2">
-          <button className="p-2 cursor-pointer hover:bg-gray-600/30 rounded-md transition">
-            <Paperclip className="text-white w-5 h-5" />
-          </button>
+          <UploadDialog>
+            <button className="p-2 cursor-pointer hover:bg-gray-600/30 rounded-md transition">
+              <Paperclip className="text-white w-5 h-5" />
+            </button>
+          </UploadDialog>
 
           <div className="flex gap-2">
             <button className="p-2 cursor-pointer hover:bg-gray-600/30 rounded-md transition">
