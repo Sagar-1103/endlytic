@@ -6,6 +6,10 @@ import {
   MediaUploadedRequest,
   MediaUploadedResponse,
 } from "@repo/proto/media";
+import prismaClient from "@repo/db/client";
+import amqp from "amqplib/callback_api";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const getPresignedUrl = async (
   call: grpc.ServerUnaryCall<GetPresignedUrlRequest, GetPresignedUrlResponse>,
@@ -52,9 +56,9 @@ export const mediaUploaded = async (
   cb: grpc.sendUnaryData<MediaUploadedResponse>
 ) => {
   try {
-    const { url } = call.request;
+    const { fileName,authorId } = call.request;
 
-    if (!url) {
+    if (!fileName) {
       return cb(
         {
           code: grpc.status.INVALID_ARGUMENT,
@@ -64,7 +68,38 @@ export const mediaUploaded = async (
       );
     }
 
+    await prismaClient.collection.create({
+      data:{
+        authorId:authorId,
+        title:fileName,
+      }
+    })
+
     // push the url into the queue to be consumed for indexing 
+    amqp.connect("amqp://localhost",function(error0,connection){
+      if(error0){
+        throw error0;
+      }
+
+      connection.createChannel(function(erro1,channel){
+        if(erro1){
+          throw erro1;
+        }
+
+        const queue = "collections";
+        const message = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+        channel.assertQueue(queue,{
+          durable:true,
+        });
+
+        channel.sendToQueue(queue,Buffer.from(message),{persistent:true});
+        console.log(" [x] Sent '%s'", message);
+      });
+      setTimeout(() => {
+        connection.close();
+      }, 500);
+    })
 
     const response: MediaUploadedResponse = {
       message: "Media status updated",

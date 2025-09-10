@@ -28,13 +28,15 @@ export const generatePresignedUrl = async (req:Request,res:Response) => {
 };
 
 export const completeUpload = async(req:Request,res:Response) => {
-    const {url} = req.body;
+    const {fileName,fileType} = req.body;
 
-    if(!url) {
+    const authorId = req.userId;
+
+    if(!fileName || !authorId) {
         return res.status(401).json({success:false,message:"Missing required fields"});
     }
 
-    const mediaUploadedRequest:MediaUploadedRequest = {url};
+    const mediaUploadedRequest:MediaUploadedRequest = {fileName,authorId};
 
     mediaClient.mediaUploaded(mediaUploadedRequest,async(err:grpc.ServiceError | null,response:MediaUploadedResponse)=>{
         if(err) {

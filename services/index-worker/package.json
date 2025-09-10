@@ -1,5 +1,5 @@
 {
-  "name": "media-service",
+  "name": "index-worker",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -13,17 +13,11 @@
   "description": "",
   "devDependencies": {
     "@repo/db": "workspace:*",
-    "@repo/proto": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/amqplib": "^0.10.7",
-    "ts-proto": "^2.7.7",
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.13.4",
-    "@grpc/proto-loader": "^0.8.0",
-    "amqplib": "^0.10.9",
-    "aws-sdk": "^2.1692.0",
-    "dotenv": "^17.2.2"
+    "amqplib": "^0.10.9"
   }
 }
