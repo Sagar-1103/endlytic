@@ -19,7 +19,7 @@ export default function MainContent({ children }: MainContentProps) {
             {chatTitle}
           </p>
         </div>
-        <div className="pt-12 px-6 pb-6 h-full overflow-auto">{children}</div>
+        <div className="pt-12 px-6 pb-6 h-full overflow-auto custom-scrollbar">{children}</div>
       </div>
     </main>
   );
