@@ -17,11 +17,11 @@ export default function ChatBox() {
         </Button>
         <RadioGroup />
       </div>
-      <div className="w-[80%] border-2 border-emerald-900/20 bg-gray-700/20 mx-auto rounded-2xl p-3">
+      <div className="w-[80%] border-2 border-emerald-900/20 bg-[#0f1411] mx-auto rounded-2xl p-3">
         <Textarea
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
-          className="border-none focus-visible:ring-0 resize-none outline-none text-white bg-transparent placeholder-gray-400 w-full md:text-md max-h-[250px] overflow-y-auto custom-scrollbar"
+          className="border-none focus-visible:ring-0 resize-none outline-none text-white placeholder-gray-400 w-full md:text-md max-h-[250px] overflow-y-auto custom-scrollbar"
           placeholder="Ask me anything about your API..."
         />
 
@@ -46,7 +46,7 @@ export default function ChatBox() {
         </div>
       </div>
 
-      <div className="w-[80%] mx-auto flex flex-row gap-x-4 justify-center">
+      {/* <div className="w-[80%] mx-auto flex flex-row gap-x-4 justify-center">
         <Button className="bg-[#0f1411] hover:bg-[#0f1411] border-2 cursor-pointer border-emerald-900/40">
           Write
         </Button>
@@ -56,7 +56,7 @@ export default function ChatBox() {
         <Button className="bg-[#0f1411] hover:bg-[#0f1411] border-2 cursor-pointer border-emerald-900/40">
           Code
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }
