@@ -18,6 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from 'uuid';
 
 interface UploadDialogProps {
   children: React.ReactNode;
@@ -41,10 +42,10 @@ export function UploadDialog({ children }: UploadDialogProps) {
     if (!file) return;
 
     setUploading(true);
-
+    const uuid = uuidv4();
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/presigned-url?fileName=${file.name}&fileType=${file.type}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/presigned-url?fileName=${file.name}-${uuid}&fileType=${file.type}`,
         {
           headers: {
             Authorization: `Bearer ${data?.jwtToken}`,
@@ -68,7 +69,7 @@ export function UploadDialog({ children }: UploadDialogProps) {
 
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/complete`,
-        { fileName: file.name },
+        { fileName: `${file.name}-${uuid}` },
         {
           headers: {
             Authorization: `Bearer ${data?.jwtToken}`,
