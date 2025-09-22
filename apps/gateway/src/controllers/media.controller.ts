@@ -28,7 +28,7 @@ export const generatePresignedUrl = async (req:Request,res:Response) => {
 };
 
 export const completeUpload = async(req:Request,res:Response) => {
-    const {fileName,fileType} = req.body;
+    const {fileName} = req.body;
 
     const authorId = req.userId;
 

@@ -20,6 +20,7 @@ model Collection {
   id          String @id @default(uuid())
   title       String
   description String?
+  indexed     Boolean @default(false)
   authorId    String
   createdAt   DateTime @default(now())
   user      User     @relation(fields: [authorId], references: [id])

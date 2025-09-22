@@ -68,7 +68,7 @@ export const mediaUploaded = async (
       );
     }
 
-    await prismaClient.collection.create({
+    const collection = await prismaClient.collection.create({
       data:{
         authorId:authorId,
         title:fileName,
@@ -87,13 +87,16 @@ export const mediaUploaded = async (
         }
 
         const queue = "collections";
-        const message = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+        const message = {
+          url:`https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
+          id:collection.id
+        }
 
         channel.assertQueue(queue,{
           durable:true,
         });
 
-        channel.sendToQueue(queue,Buffer.from(message),{persistent:true});
+        channel.sendToQueue(queue,Buffer.from(JSON.stringify(message)),{persistent:true});
         console.log(" [x] Sent '%s'", message);
       });
       setTimeout(() => {
