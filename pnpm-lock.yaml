@@ -384,6 +384,49 @@ importers:
         specifier: ^5.9.2
         version: 5.9.2
 
+  services/query-server:
+    dependencies:
+      '@google/generative-ai':
+        specifier: ^0.24.1
+        version: 0.24.1
+      '@grpc/grpc-js':
+        specifier: ^1.13.4
+        version: 1.13.4
+      '@grpc/proto-loader':
+        specifier: ^0.8.0
+        version: 0.8.0
+      '@langchain/google-genai':
+        specifier: ^0.2.18
+        version: 0.2.18(@langchain/core@0.3.77(openai@5.12.2(zod@4.1.8)))
+      '@langchain/pinecone':
+        specifier: ^0.2.0
+        version: 0.2.0(@langchain/core@0.3.77(openai@5.12.2(zod@4.1.8)))(@pinecone-database/pinecone@5.1.2)
+      '@pinecone-database/pinecone':
+        specifier: '5'
+        version: 5.1.2
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
+      google-protobuf:
+        specifier: ^4.0.0
+        version: 4.0.0
+    devDependencies:
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@repo/proto':
+        specifier: workspace:*
+        version: link:../../packages/proto
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      ts-proto:
+        specifier: ^2.7.7
+        version: 2.7.7
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
 packages:
 
   '@alloc/quick-lru@5.2.0':
@@ -2032,6 +2075,9 @@ packages:
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
+
+  google-protobuf@4.0.0:
+    resolution: {integrity: sha512-b8wmenhUMf2WNL+xIJ/slvD/hEE6V3nRnG86O2bzkBrMweM9gnqZE1dfXlDjibY3aXJXDNbAHepevYyQ7qWKsQ==}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -5156,6 +5202,8 @@ snapshots:
     dependencies:
       define-properties: 1.2.1
       gopd: 1.2.0
+
+  google-protobuf@4.0.0: {}
 
   gopd@1.2.0: {}
 

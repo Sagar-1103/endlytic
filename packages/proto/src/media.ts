@@ -40,6 +40,15 @@ export interface MediaUploadedResponse {
   message: string;
 }
 
+export interface CollectionQueryRequest {
+  query: string;
+  collection: string;
+}
+
+export interface CollectionQueryResponse {
+  jsonData: string;
+}
+
 function createBaseGetPresignedUrlRequest(): GetPresignedUrlRequest {
   return { fileName: "", fileType: "" };
 }
@@ -326,6 +335,140 @@ export const MediaUploadedResponse: MessageFns<MediaUploadedResponse> = {
   },
 };
 
+function createBaseCollectionQueryRequest(): CollectionQueryRequest {
+  return { query: "", collection: "" };
+}
+
+export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
+  encode(message: CollectionQueryRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.query !== "") {
+      writer.uint32(10).string(message.query);
+    }
+    if (message.collection !== "") {
+      writer.uint32(18).string(message.collection);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CollectionQueryRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollectionQueryRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.query = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.collection = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CollectionQueryRequest {
+    return {
+      query: isSet(object.query) ? globalThis.String(object.query) : "",
+      collection: isSet(object.collection) ? globalThis.String(object.collection) : "",
+    };
+  },
+
+  toJSON(message: CollectionQueryRequest): unknown {
+    const obj: any = {};
+    if (message.query !== "") {
+      obj.query = message.query;
+    }
+    if (message.collection !== "") {
+      obj.collection = message.collection;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CollectionQueryRequest>, I>>(base?: I): CollectionQueryRequest {
+    return CollectionQueryRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CollectionQueryRequest>, I>>(object: I): CollectionQueryRequest {
+    const message = createBaseCollectionQueryRequest();
+    message.query = object.query ?? "";
+    message.collection = object.collection ?? "";
+    return message;
+  },
+};
+
+function createBaseCollectionQueryResponse(): CollectionQueryResponse {
+  return { jsonData: "" };
+}
+
+export const CollectionQueryResponse: MessageFns<CollectionQueryResponse> = {
+  encode(message: CollectionQueryResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.jsonData !== "") {
+      writer.uint32(10).string(message.jsonData);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CollectionQueryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollectionQueryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.jsonData = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CollectionQueryResponse {
+    return { jsonData: isSet(object.jsonData) ? globalThis.String(object.jsonData) : "" };
+  },
+
+  toJSON(message: CollectionQueryResponse): unknown {
+    const obj: any = {};
+    if (message.jsonData !== "") {
+      obj.jsonData = message.jsonData;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CollectionQueryResponse>, I>>(base?: I): CollectionQueryResponse {
+    return CollectionQueryResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CollectionQueryResponse>, I>>(object: I): CollectionQueryResponse {
+    const message = createBaseCollectionQueryResponse();
+    message.jsonData = object.jsonData ?? "";
+    return message;
+  },
+};
+
 export type MediaServiceService = typeof MediaServiceService;
 export const MediaServiceService = {
   getPresignedUrl: {
@@ -349,11 +492,23 @@ export const MediaServiceService = {
       Buffer.from(MediaUploadedResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): MediaUploadedResponse => MediaUploadedResponse.decode(value),
   },
+  collectionQuery: {
+    path: "/media.MediaService/CollectionQuery",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CollectionQueryRequest): Buffer =>
+      Buffer.from(CollectionQueryRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CollectionQueryRequest => CollectionQueryRequest.decode(value),
+    responseSerialize: (value: CollectionQueryResponse): Buffer =>
+      Buffer.from(CollectionQueryResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CollectionQueryResponse => CollectionQueryResponse.decode(value),
+  },
 } as const;
 
 export interface MediaServiceServer extends UntypedServiceImplementation {
   getPresignedUrl: handleUnaryCall<GetPresignedUrlRequest, GetPresignedUrlResponse>;
   mediaUploaded: handleUnaryCall<MediaUploadedRequest, MediaUploadedResponse>;
+  collectionQuery: handleUnaryCall<CollectionQueryRequest, CollectionQueryResponse>;
 }
 
 export interface MediaServiceClient extends Client {
@@ -386,6 +541,21 @@ export interface MediaServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: MediaUploadedResponse) => void,
+  ): ClientUnaryCall;
+  collectionQuery(
+    request: CollectionQueryRequest,
+    callback: (error: ServiceError | null, response: CollectionQueryResponse) => void,
+  ): ClientUnaryCall;
+  collectionQuery(
+    request: CollectionQueryRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: CollectionQueryResponse) => void,
+  ): ClientUnaryCall;
+  collectionQuery(
+    request: CollectionQueryRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: CollectionQueryResponse) => void,
   ): ClientUnaryCall;
 }
 

@@ -89,7 +89,8 @@ export const mediaUploaded = async (
         const queue = "collections";
         const message = {
           url:`https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
-          id:collection.id
+          id:collection.id,
+          fileName:collection.title,
         }
 
         channel.assertQueue(queue,{

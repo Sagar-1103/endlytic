@@ -5,6 +5,7 @@ package media;
 service MediaService {
     rpc GetPresignedUrl (GetPresignedUrlRequest) returns (GetPresignedUrlResponse);
     rpc MediaUploaded (MediaUploadedRequest) returns (MediaUploadedResponse);
+    rpc CollectionQuery (CollectionQueryRequest) returns (CollectionQueryResponse);
 }
 
 message GetPresignedUrlRequest {
@@ -24,4 +25,13 @@ message MediaUploadedRequest {
 
 message MediaUploadedResponse {
     string message = 2;
+}
+
+message CollectionQueryRequest {
+    string query= 1;
+    string collection= 2;
+}
+
+message CollectionQueryResponse {
+    string jsonData = 1;
 }
