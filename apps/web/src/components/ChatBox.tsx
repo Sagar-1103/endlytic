@@ -5,9 +5,55 @@ import { Textarea } from "./ui/textarea";
 import { ArrowUpCircle, Mic, Paperclip } from "lucide-react";
 import RadioGroup from "./CollectionRadioGroup";
 import { UploadDialog } from "./UploadDialog";
+import { usePathname, useRouter } from "next/navigation";
+import { getSession } from "next-auth/react";
+import { useActiveCollectionStore } from "@/store/useStore";
 
 export default function ChatBox() {
   const [chatInput, setChatInput] = useState("");
+  const pathname = usePathname();
+  const chatId = pathname.split("/chat/")?.[1];
+  const { activeCollection } = useActiveCollectionStore();
+  const router = useRouter();
+
+  const handleSendMessage = async () => {
+    try {
+      if (!activeCollection) return;
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/query`;
+      const session = await getSession();
+      if (!session?.jwtToken) return;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.jwtToken}`,
+        },
+        body: JSON.stringify({ query: chatInput,collectionId:activeCollection.id,chatId:chatId }),
+      });
+
+      if (!response.body) return;
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+      let result;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          result = JSON.parse(chunk);
+        }
+      }
+      setChatInput("");
+      if(!chatId) {
+        router.push(`/chat/${result.chatId}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="absolute w-full bottom-0 flex flex-col gap-y-3">
@@ -37,7 +83,8 @@ export default function ChatBox() {
               <Mic className="text-white w-5 h-5" />
             </button>
             <button
-              disabled={chatInput ? true : false}
+              disabled={chatInput ? false : true}
+              onClick={handleSendMessage}
               className={`p-2 bg-gradient-to-b ${chatInput.length ? "from-emerald-300 to-emerald-400 hover:from-emerald-500 cursor-pointer" : "from-emerald-300/30 to-emerald-300/30"} rounded-md transition`}
             >
               <ArrowUpCircle className="text-black  w-5 h-5" />

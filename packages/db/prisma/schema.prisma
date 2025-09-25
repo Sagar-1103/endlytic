@@ -13,7 +13,9 @@ model User {
   name  String?
   image String?
   password String?
-  collection Collection[]
+  collections Collection[]
+  chats      Chat[]
+  messages   Message[]
 }
 
 model Collection {
@@ -23,5 +25,31 @@ model Collection {
   indexed     Boolean @default(false)
   authorId    String
   createdAt   DateTime @default(now())
-  user      User     @relation(fields: [authorId], references: [id])
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [authorId], references: [id])
+}
+
+model Chat {
+  id          String @id @default(uuid())
+  authorId    String
+  title       String?
+  messages    Message[]
+  user        User   @relation(fields: [authorId], references: [id])
+}
+
+enum Role {
+  User
+  Ai
+}
+
+model Message {
+  id          Int @id @default(autoincrement())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  role        Role
+  chatId      String
+  chat        Chat    @relation(fields: [chatId],references: [id])
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id])
 }

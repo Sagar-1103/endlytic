@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { Collection } from "lib/types";
 import { useActiveCollectionStore } from "@/store/useStore";
+import axios from "axios";
 
 export default function RadioGroup() {
   const { activeCollection, setActiveCollection } = useActiveCollectionStore();
@@ -20,11 +21,11 @@ export default function RadioGroup() {
 
   const getCollections = async () => {
     try {
-      const response = await fetch("/api/collections");
-      const res = await response.json();
+      const response = await axios.get("/api/collections");
+      const res = await response.data;
       setCollections(res.collections || []);
     } catch (error) {
-      console.error("Error fetching collections:", error);
+      console.log("Error fetching collections:", error);
       setCollections([]);
     }
   };
