@@ -40,17 +40,18 @@ amqp.connect("amqp://localhost",function(error0:Error,connection:Connection) {
 
         channel.consume(queue,async function(message){
             if(message){
-                const {id,url,fileName} = JSON.parse(message.content.toString());
-                const parsedCollection = await splitCollection(url,vectorStore,fileName);
+                const {id,url,userId} = JSON.parse(message.content.toString());
+                const parsedCollection = await splitCollection(url,id,vectorStore,userId);
                 await prismaClient.collection.update({
                     where:{
                         id,
                     },
                     data:{
                         indexed:true,
+                        description:JSON.stringify(parsedCollection.collectionDescription),
                     }
                 })
-                console.log(`${parsedCollection.id} - ${parsedCollection.collectionName}`);
+                console.log(`${id} - ${parsedCollection.collectionName}`);
                 channel.ack(message);
             }
         },{

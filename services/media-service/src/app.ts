@@ -90,7 +90,7 @@ export const mediaUploaded = async (
         const message = {
           url:`https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
           id:collection.id,
-          fileName:collection.title,
+          userId:authorId,
         }
 
         channel.assertQueue(queue,{
@@ -98,7 +98,7 @@ export const mediaUploaded = async (
         });
 
         channel.sendToQueue(queue,Buffer.from(JSON.stringify(message)),{persistent:true});
-        console.log(" [x] Sent '%s'", message);
+        // console.log(" [x] Sent '%s'", message);
       });
       setTimeout(() => {
         connection.close();

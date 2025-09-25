@@ -1,10 +1,31 @@
 "use client";
 import { usePathname } from "next/navigation";
 import SidebarChatItem from "./SidebarChatItem";
-import { chats } from "@/data/sidebar-data";
+import { useEffect, useState } from "react";
+
+export interface Chat {
+  id: string;
+  title: string | null;
+  authorId: string;
+}
 
 export default function SidebarChats() {
   const pathName = usePathname();
+  const [chats,setChats] = useState<Chat[]>([]);
+
+  const getChats = async()=>{
+    try {
+      const response = await fetch("/api/chats");
+      const res = await response.json();
+      setChats(res.chats);
+            
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(()=>{
+    getChats();
+  },[])
 
   return (
     <div className="mt-6">

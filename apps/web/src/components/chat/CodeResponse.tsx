@@ -6,17 +6,15 @@ import {  CopyIcon } from "@/lib/icons";
 import { CheckIcon } from "lucide-react";
 
 export default function CodeResponse({
-  lang,
   code,
 }: {
-  lang: string;
-  code: string;
+  code: any;
 }) {
   const [copied, setCopied] = useState(false);
-
+  
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(code.content);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -27,12 +25,12 @@ export default function CodeResponse({
   return (
     <div className="relative my-14">
       <SyntaxHighlighter
-        language={lang}
+        language={code.language}
         style={dracula}
         wrapLines={true}
         customStyle={{ backgroundColor: "#000", borderRadius: "0.5rem" }}
       >
-        {code}
+        {code.content}
       </SyntaxHighlighter>
 
       <button

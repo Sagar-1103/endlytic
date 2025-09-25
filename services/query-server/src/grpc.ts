@@ -12,7 +12,7 @@ export const startGrpcServer = () => {
             console.error("gRPC Server Error:", error);
             return;
         } else {
-            console.log(`Media service running at 127.0.0.1:${port}`);
+            console.log(`Query service running at 127.0.0.1:${port}`);
         }
     })
 }

@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import mediaRouter from "./routes/media.routes";
+import queryRouter from "./routes/query.routes";
 dotenv.config();
 
 const app:Express = express();
@@ -18,6 +19,7 @@ app.get("/",(req:Request,res:Response)=>{
 })
 
 app.use("/upload",mediaRouter);
+app.use("/query",queryRouter);
 
 app.listen(PORT,()=>{
     console.log(`Gateway running on port ${PORT}`);

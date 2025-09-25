@@ -16,11 +16,11 @@ export async function GET() {
     const { payload } = await jwtVerify(tokenFromCookie.value, jwk);
     userId = (payload as JWTPayload).id as string;
 
-    const collections = await prismaClient.collection.findMany({
+    const chats = await prismaClient.chat.findMany({
         where:{
             authorId:userId
         }
     });
 
-    return NextResponse.json({status:200,collections,message:"Collections fetched successfully"});
+    return NextResponse.json({status:200,chats,message:"Collections fetched successfully"});
 }

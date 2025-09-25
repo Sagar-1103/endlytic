@@ -11,7 +11,9 @@ import {
   type ChannelCredentials,
   Client,
   type ClientOptions,
+  type ClientReadableStream,
   type ClientUnaryCall,
+  type handleServerStreamingCall,
   type handleUnaryCall,
   makeGenericClientConstructor,
   type Metadata,
@@ -42,7 +44,9 @@ export interface MediaUploadedResponse {
 
 export interface CollectionQueryRequest {
   query: string;
-  collection: string;
+  collectionId: string;
+  authorId: string;
+  chatId?: string | undefined;
 }
 
 export interface CollectionQueryResponse {
@@ -336,7 +340,7 @@ export const MediaUploadedResponse: MessageFns<MediaUploadedResponse> = {
 };
 
 function createBaseCollectionQueryRequest(): CollectionQueryRequest {
-  return { query: "", collection: "" };
+  return { query: "", collectionId: "", authorId: "", chatId: undefined };
 }
 
 export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
@@ -344,8 +348,14 @@ export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
     if (message.query !== "") {
       writer.uint32(10).string(message.query);
     }
-    if (message.collection !== "") {
-      writer.uint32(18).string(message.collection);
+    if (message.collectionId !== "") {
+      writer.uint32(18).string(message.collectionId);
+    }
+    if (message.authorId !== "") {
+      writer.uint32(26).string(message.authorId);
+    }
+    if (message.chatId !== undefined) {
+      writer.uint32(34).string(message.chatId);
     }
     return writer;
   },
@@ -370,7 +380,23 @@ export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
             break;
           }
 
-          message.collection = reader.string();
+          message.collectionId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.authorId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.chatId = reader.string();
           continue;
         }
       }
@@ -385,7 +411,9 @@ export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
   fromJSON(object: any): CollectionQueryRequest {
     return {
       query: isSet(object.query) ? globalThis.String(object.query) : "",
-      collection: isSet(object.collection) ? globalThis.String(object.collection) : "",
+      collectionId: isSet(object.collectionId) ? globalThis.String(object.collectionId) : "",
+      authorId: isSet(object.authorId) ? globalThis.String(object.authorId) : "",
+      chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : undefined,
     };
   },
 
@@ -394,8 +422,14 @@ export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
     if (message.query !== "") {
       obj.query = message.query;
     }
-    if (message.collection !== "") {
-      obj.collection = message.collection;
+    if (message.collectionId !== "") {
+      obj.collectionId = message.collectionId;
+    }
+    if (message.authorId !== "") {
+      obj.authorId = message.authorId;
+    }
+    if (message.chatId !== undefined) {
+      obj.chatId = message.chatId;
     }
     return obj;
   },
@@ -406,7 +440,9 @@ export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
   fromPartial<I extends Exact<DeepPartial<CollectionQueryRequest>, I>>(object: I): CollectionQueryRequest {
     const message = createBaseCollectionQueryRequest();
     message.query = object.query ?? "";
-    message.collection = object.collection ?? "";
+    message.collectionId = object.collectionId ?? "";
+    message.authorId = object.authorId ?? "";
+    message.chatId = object.chatId ?? undefined;
     return message;
   },
 };
@@ -495,7 +531,7 @@ export const MediaServiceService = {
   collectionQuery: {
     path: "/media.MediaService/CollectionQuery",
     requestStream: false,
-    responseStream: false,
+    responseStream: true,
     requestSerialize: (value: CollectionQueryRequest): Buffer =>
       Buffer.from(CollectionQueryRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer): CollectionQueryRequest => CollectionQueryRequest.decode(value),
@@ -508,7 +544,7 @@ export const MediaServiceService = {
 export interface MediaServiceServer extends UntypedServiceImplementation {
   getPresignedUrl: handleUnaryCall<GetPresignedUrlRequest, GetPresignedUrlResponse>;
   mediaUploaded: handleUnaryCall<MediaUploadedRequest, MediaUploadedResponse>;
-  collectionQuery: handleUnaryCall<CollectionQueryRequest, CollectionQueryResponse>;
+  collectionQuery: handleServerStreamingCall<CollectionQueryRequest, CollectionQueryResponse>;
 }
 
 export interface MediaServiceClient extends Client {
@@ -544,19 +580,13 @@ export interface MediaServiceClient extends Client {
   ): ClientUnaryCall;
   collectionQuery(
     request: CollectionQueryRequest,
-    callback: (error: ServiceError | null, response: CollectionQueryResponse) => void,
-  ): ClientUnaryCall;
+    options?: Partial<CallOptions>,
+  ): ClientReadableStream<CollectionQueryResponse>;
   collectionQuery(
     request: CollectionQueryRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: CollectionQueryResponse) => void,
-  ): ClientUnaryCall;
-  collectionQuery(
-    request: CollectionQueryRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: CollectionQueryResponse) => void,
-  ): ClientUnaryCall;
+    metadata?: Metadata,
+    options?: Partial<CallOptions>,
+  ): ClientReadableStream<CollectionQueryResponse>;
 }
 
 export const MediaServiceClient = makeGenericClientConstructor(

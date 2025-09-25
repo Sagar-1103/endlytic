@@ -1,9 +1,9 @@
 import { importJWK, JWTPayload, jwtVerify } from "jose";
 import prismaClient from "lib/db";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest,{ params }: { params: Promise<{ chatId: string }> }) {
     const cookieStore = await cookies();
     const tokenFromCookie = cookieStore.get('jwtToken') ?? null;
     let userId;
@@ -15,12 +15,16 @@ export async function GET() {
 
     const { payload } = await jwtVerify(tokenFromCookie.value, jwk);
     userId = (payload as JWTPayload).id as string;
-
-    const collections = await prismaClient.collection.findMany({
+    const {chatId} = await params;
+    
+    if (!chatId) {
+        return NextResponse.json({status:401,message:"Missing chat id"});
+    }
+    
+    const messages = await prismaClient.message.findMany({
         where:{
-            authorId:userId
+            chatId,
         }
-    });
-
-    return NextResponse.json({status:200,collections,message:"Collections fetched successfully"});
+    })
+    return NextResponse.json({status:200,messages,message:"Collections fetched successfully"});
 }

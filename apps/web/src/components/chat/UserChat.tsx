@@ -1,16 +1,23 @@
 "use client";
-import { CopyIcon, RetryIcon, ShareIcon ,EditIcon } from "@/lib/icons";
+import { CopyIcon ,EditIcon } from "@/lib/icons";
 import { Tooltip } from 'react-tooltip'
 import { CheckIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Message } from "@/types";
 
 
 
-export default function UserChat({ query }: { query: string }) {
+export default function UserChat({ message }: { message: Message }) {
    const [copied, setCopied] = useState(false);
    const [isEditing, setIsEditing] = useState(false);
-   const [editedText, setEditedText] = useState(query);
-   const [currentQuery, setCurrentQuery] = useState(query);
+   const [editedText, setEditedText] = useState("");
+   const [currentQuery, setCurrentQuery] = useState("");
+
+   useEffect(()=>{
+      const content = JSON.parse(message.content);
+      setEditedText(content.text);
+      setCurrentQuery(content.text);
+   },[])
 
    const handleCopy = async () => {
       try {

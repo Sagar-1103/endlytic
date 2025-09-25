@@ -1,17 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UploadDialog } from "@/components/UploadDialog";
+import { importJWK, JWTPayload, jwtVerify } from "jose";
 import prismaClient from "lib/db";
 import { Ellipsis, Plus } from "lucide-react";
-import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 
 export default async function Collections() {
-  const session = await getServerSession();
+  const cookieStore = await cookies();
+  const tokenFromCookie = cookieStore.get('jwtToken') ?? null;
+  let userId;
   let collections;
-  if (session?.user) {
+  const secret = process.env.JWT_SECRET || '';
+  const jwk = await importJWK({ k: secret, alg: 'HS256', kty: 'oct' });
+  
+  if (tokenFromCookie) {
+    const { payload } = await jwtVerify(tokenFromCookie.value, jwk);
+    userId = (payload as JWTPayload).id as string;
     collections = await prismaClient.collection.findMany({
       where: {
-        authorId: session?.user.id,
+        authorId: userId,
       },
     });
   }
