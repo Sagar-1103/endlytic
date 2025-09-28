@@ -1,20 +1,23 @@
 "use client";
 import { useState } from "react";
-import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { ArrowUpCircle, Mic, Paperclip } from "lucide-react";
 import RadioGroup from "./CollectionRadioGroup";
 import { UploadDialog } from "./UploadDialog";
 import { usePathname, useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
-import { useActiveCollectionStore } from "@/store/useStore";
+import { useActiveCollectionStore, useChatMessagesStore, useChatTitleStore } from "@/store/useStore";
+import { v4 as uuidv4 } from 'uuid';
+import { useIsStreamingStore } from "@/store/useChatsStore";
 
 export default function ChatBox() {
   const [chatInput, setChatInput] = useState("");
   const pathname = usePathname();
-  const chatId = pathname.split("/chat/")?.[1];
   const { activeCollection } = useActiveCollectionStore();
   const router = useRouter();
+  const { addMessage } = useChatMessagesStore();
+  const { setChatTitle } = useChatTitleStore();
+  const { setIsStreaming } = useIsStreamingStore();
 
   const handleSendMessage = async () => {
     try {
@@ -22,6 +25,14 @@ export default function ChatBox() {
       const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/query`;
       const session = await getSession();
       if (!session?.jwtToken) return;
+      const chatId = pathname.split("/chat/")?.[1] || uuidv4();
+      if (!pathname.split("/chat/")?.[1]) {
+        localStorage.setItem("newId", chatId);
+        router.push(`/chat/${chatId}`);
+      }
+      setChatInput("");
+      addMessage("User",JSON.stringify({text:chatInput}));
+      setIsStreaming(true);
 
       const response = await fetch(url, {
         method: "POST",
@@ -43,27 +54,29 @@ export default function ChatBox() {
         done = readerDone;
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          result = JSON.parse(chunk);
+          addMessage("Ai",chunk);
+          try {
+            result = JSON.parse(chunk);
+          } catch (error) {
+            console.log("error parsing chunk");
+          }
         }
       }
-      setChatInput("");
-      if(!chatId) {
-        router.push(`/chat/${result.chatId}`);
-      }
+
+      setChatTitle(result.title)
+      setIsStreaming(false);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
   return (
     <div className="absolute w-full bottom-0 flex flex-col gap-y-3">
-      <div className="w-[80%] mx-auto flex flex-row justify-end gap-x-4">
-        {/* <Button className="bg-[#0f1411] cursor-pointer hover:bg-[#0f1411] border-2 border-emerald-900/40">
-          Model
-        </Button> */}
+      <div className="w-[80%] max-w-[75rem] mx-auto flex flex-row justify-end gap-x-4">
         <RadioGroup />
       </div>
-      <div className="sm:w-[80%] max-w-5xl border-2 border-emerald-900/20 bg-[#0f1411] sm:mx-auto rounded-2xl p-1 sm:p-3">
+      <div className="pb-4 w-[80%] max-w-[75rem] mx-auto bg-[#0f1411]">
+      <div className="w-full border-2 border-emerald-900/20 bg-[#161f19] mx-auto rounded-2xl p-3">
         <Textarea
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
@@ -83,27 +96,16 @@ export default function ChatBox() {
               <Mic className="text-white w-5 h-5" />
             </button>
             <button
-              disabled={chatInput ? false : true}
+              disabled={activeCollection && chatInput ? false : true}
               onClick={handleSendMessage}
-              className={`p-2 bg-gradient-to-b ${chatInput.length ? "from-emerald-300 to-emerald-400 hover:from-emerald-500 cursor-pointer" : "from-emerald-300/30 to-emerald-300/30"} rounded-md transition`}
+              className={`p-2 bg-gradient-to-b ${activeCollection && chatInput.length ? "from-emerald-300 to-emerald-400 hover:from-emerald-500 cursor-pointer" : "from-emerald-300/30 to-emerald-300/30"} rounded-md transition`}
             >
               <ArrowUpCircle className="text-black  w-5 h-5" />
             </button>
           </div>
         </div>
       </div>
-
-      {/* <div className="w-[80%] mx-auto flex flex-row gap-x-4 justify-center">
-        <Button className="bg-[#0f1411] hover:bg-[#0f1411] border-2 cursor-pointer border-emerald-900/40">
-          Write
-        </Button>
-        <Button className="bg-[#0f1411] hover:bg-[#0f1411] border-2 cursor-pointer border-emerald-900/40">
-          Learn
-        </Button>
-        <Button className="bg-[#0f1411] hover:bg-[#0f1411] border-2 cursor-pointer border-emerald-900/40">
-          Code
-        </Button>
-      </div> */}
+      </div>
     </div>
   );
 }

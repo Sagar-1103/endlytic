@@ -19,8 +19,11 @@ export async function GET() {
     const chats = await prismaClient.chat.findMany({
         where:{
             authorId:userId
+        },
+        orderBy:{
+            updatedAt:"desc",
         }
     });
 
-    return NextResponse.json({status:200,chats,message:"Collections fetched successfully"});
+    return NextResponse.json({status:200,chats,message:"Chats fetched successfully"});
 }

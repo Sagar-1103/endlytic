@@ -4,4 +4,5 @@ export interface Collection {
   title: string;
   description?: string;
   authorId: string;
+  indexed:boolean;
 }

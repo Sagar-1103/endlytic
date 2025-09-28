@@ -32,7 +32,7 @@ export const collectionQuery = async (
     try {
         const { collectionId, authorId, query, chatId } = call.request;
 
-        if (!collectionId || !query) {
+        if (!collectionId || !query || !chatId) {
             call.emit("error", {
                 code: grpc.status.INVALID_ARGUMENT,
                 message: "Missing required fields",
@@ -56,22 +56,17 @@ export const collectionQuery = async (
             return;
         }
 
-        let chat;
-
-        if(!chatId) {
-            chat = await prismaClient.chat.create({
-                data:{
-                    authorId:authorId
-                }
-            })    
-        } else {
-            chat = await prismaClient.chat.findFirst({
-                where:{
-                    authorId,
-                    id:chatId,
-                }
-            })
-        }
+        let chat = await prismaClient.chat.upsert({
+            where:{
+                id:chatId,
+                authorId:authorId,
+            },
+            create:{
+                id:chatId,
+                authorId:authorId,
+            },
+            update:{ }
+        });
 
         if (!chat) {
             call.emit("error", {
@@ -81,6 +76,14 @@ export const collectionQuery = async (
             call.end();
             return;
         }
+
+        const history = await prismaClient.message.findMany({
+            where:{
+                authorId,
+                chatId
+            },
+            take: 4,
+        })
 
         const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
             pineconeIndex,
@@ -137,6 +140,9 @@ export const collectionQuery = async (
         User query: {query}
         Chat Title: {chatTitle}
 
+        ## History
+        History: {chat_history}
+
         ## FORMAT 
         Format: {format_instructions}
         `;
@@ -147,11 +153,13 @@ export const collectionQuery = async (
 
         const partialedPrompt = await prompt.partial({
             format_instructions: formatInstructions,
+            chat_history:JSON.stringify(history),
+            context:JSON.stringify(context)
         });
 
         const chain = partialedPrompt.pipe(model).pipe(parser);
         let result;
-        for await (const s of await chain.stream({context:JSON.stringify(context), query,description:collection.description,chatTitle:chat?.title })) {
+        for await (const s of await chain.stream({query,description:collection.description,chatTitle:chat?.title })) {
             s.chatId=chat.id;
             const response: CollectionQueryResponse = {
                 jsonData:JSON.stringify(s)
@@ -160,7 +168,7 @@ export const collectionQuery = async (
             result = s;
         }
 
-        if(!chatId) {
+        if(!chat.title) {
             await prismaClient.chat.update({
                 where:{
                     id:chat?.id
@@ -171,25 +179,22 @@ export const collectionQuery = async (
             })
         }
 
-        if (chat?.id) {
-            await prismaClient.message.create({
-                data:{
+        await prismaClient.message.createMany({
+            data:[
+                {
                     role:"User",
                     content:JSON.stringify({text:query}),
                     authorId:authorId,
                     chatId:chat.id
-                }
-            })
-
-            await prismaClient.message.create({
-                data:{
+                },
+                {
                     role:"Ai",
                     content:JSON.stringify(result),
                     authorId:authorId,
                     chatId:chat.id
                 }
-            })
-        }
+            ]
+        })
 
         call.end();
 

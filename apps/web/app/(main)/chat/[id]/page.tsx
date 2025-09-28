@@ -1,40 +1,77 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef } from "react";
 import AiChat from "@/components/chat/AiChat";
 import UserChat from "@/components/chat/UserChat";
-import { Message } from "@/types";
+import { useChatMessagesStore } from "@/store/useStore";
+import LoaderAnimation from "../../../../public/Loading.json";
+import Lottie from "lottie-react";
+import { useIsStreamingStore } from "@/store/useChatsStore";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const [messages,setMessages] = useState<Message[]>([]);
+    const { chatMessages, getMessages, clearChatMessages } = useChatMessagesStore();
+    const bottomRef = useRef<HTMLDivElement>(null);
+    const { isStreaming } = useIsStreamingStore();
 
-    const getMessages = async()=>{
-        try {
-            const response = await fetch(`/api/messages/${id}`);
-            const res = await response.json();
-            setMessages(res.messages); 
-        } catch (error) {
-            console.log(error);
+    useEffect(() => {
+        const newId = localStorage.getItem("newId");
+        
+        if (newId===id) {
+            localStorage.removeItem("newId");               
+        } else {
+            clearChatMessages();
+            getMessages(id);
         }
+    }, [id]);
+
+    useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "instant" });
     }
-    useEffect(()=>{
-        getMessages();
-    },[])
+  }, [chatMessages]);
 
     return (
-        <div className="w-[80%] max-w-4xl mx-auto mb-40">
-            {messages && messages.length!==0 && messages.map((message) => (
-                <div
-                    key={message.id}
-                    className="my-5"
-                >
-                    {message.role=="Ai"?
-                      <AiChat message={message}/>
-                    :
-                       <UserChat message={message}/>
-                    }
-                </div>
-            ))}
+        <div className="max-w-[70rem] mx-auto mb-40">
+            {
+                chatMessages.length==0 && (
+                    <div className="flex items-center justify-center h-[65vh]">
+                        <Lottie
+                        animationData={LoaderAnimation}
+                        loop
+                        autoPlay
+                        className="w-40 h-40 opacity-80"
+                        />
+                    </div>
+                )
+            }
+            {chatMessages && chatMessages.length!==0 && chatMessages.map((message,index) => {
+                try {
+                const parsedMessage = JSON.parse(message.content);
+                    return (
+                        <div key={index} className="mt-5" >
+                        { message.role=="Ai"?
+                        <AiChat content={parsedMessage}/>
+                        :
+                        <UserChat text={parsedMessage.text}/>
+                        }
+                        </div>
+                );
+                } catch (error) {
+                    console.log(error);
+                    return;
+                }
+            })}
+            {
+                isStreaming && (
+                        <Lottie
+                            animationData={LoaderAnimation}
+                            loop
+                            autoPlay
+                            className="w-24 h-24 ml-3 -mt-8"
+                        />
+                )
+            }
+            <div ref={bottomRef} />
         </div>
     );
 }

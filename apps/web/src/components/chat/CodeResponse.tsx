@@ -23,7 +23,7 @@ export default function CodeResponse({
   };
 
   return (
-    <div className="relative my-14">
+    <div className="relative mt-14">
       <SyntaxHighlighter
         language={code.language}
         style={dracula}
