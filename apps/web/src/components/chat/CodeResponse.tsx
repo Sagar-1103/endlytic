@@ -28,7 +28,8 @@ export default function CodeResponse({
         language={code.language}
         style={dracula}
         wrapLines={true}
-        customStyle={{ backgroundColor: "#000", borderRadius: "0.5rem" }}
+        customStyle={{ backgroundColor: "#000", borderRadius: "0.5rem" ,fontSize: "0.9rem", }}
+        
       >
         {code.content}
       </SyntaxHighlighter>

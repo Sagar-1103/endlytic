@@ -31,7 +31,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [chatMessages]);
 
     return (
-        <div className="max-w-[70rem] mx-auto mb-40">
+        <div className="w-screen pr-5 sm:pr-0 sm:w-[80%] max-w-[70rem] mx-auto mb-40">
             {
                 chatMessages.length==0 && (
                     <div className="flex items-center justify-center h-[65vh]">

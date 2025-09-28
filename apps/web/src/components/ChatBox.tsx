@@ -75,8 +75,8 @@ export default function ChatBox() {
       <div className="w-[80%] max-w-[75rem] mx-auto flex flex-row justify-end gap-x-4">
         <RadioGroup />
       </div>
-      <div className="pb-4 w-[80%] max-w-[75rem] mx-auto bg-[#0f1411]">
-      <div className="w-full border-2 border-emerald-900/20 bg-[#161f19] mx-auto rounded-2xl p-3">
+      <div className="pb-4 w-[88%] sm:w-[80%] max-w-[75rem] sm:mx-auto  bg-[#0f1411]">
+      <div className="w-full w-min-[0] border-2 border-emerald-900/20 bg-[#161f19] mx-auto rounded-2xl p-3">
         <Textarea
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}

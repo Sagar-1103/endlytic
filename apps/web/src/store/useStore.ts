@@ -27,6 +27,11 @@ interface ChatMessagesState {
   clearChatMessages:() => void;
 }
 
+interface settingModalState {
+  settingModal: boolean;
+  setSettingModal: (val:boolean) => void;
+}
+
 export const useChatTitleStore = create<ChatTitleState>((set) => ({
     chatTitle: "Endlytic API Explorer",
     setChatTitle: (val: string) => set(() => ({ chatTitle: val })),
@@ -72,4 +77,9 @@ export const useChatMessagesStore = create<ChatMessagesState>((set)=>({
         console.log(error);
       }
     }
+}))
+
+export const settingModalStore = create<settingModalState>((set)=>({
+    settingModal:false,
+    setSettingModal: (val: boolean) => set(() => ({ settingModal: val })),
 }))
