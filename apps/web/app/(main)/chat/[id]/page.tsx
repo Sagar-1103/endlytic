@@ -22,7 +22,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     },[])
 
     return (
-        <div className="w-[80%] mx-auto mb-40">
+        <div className="w-[80%] max-w-4xl mx-auto mb-40">
             {messages && messages.length!==0 && messages.map((message) => (
                 <div
                     key={message.id}

@@ -58,12 +58,12 @@ export default function ChatBox() {
   return (
     <div className="absolute w-full bottom-0 flex flex-col gap-y-3">
       <div className="w-[80%] mx-auto flex flex-row justify-end gap-x-4">
-        <Button className="bg-[#0f1411] cursor-pointer hover:bg-[#0f1411] border-2 border-emerald-900/40">
+        {/* <Button className="bg-[#0f1411] cursor-pointer hover:bg-[#0f1411] border-2 border-emerald-900/40">
           Model
-        </Button>
+        </Button> */}
         <RadioGroup />
       </div>
-      <div className="w-[80%] border-2 border-emerald-900/20 bg-[#0f1411] mx-auto rounded-2xl p-3">
+      <div className="sm:w-[80%] max-w-5xl border-2 border-emerald-900/20 bg-[#0f1411] sm:mx-auto rounded-2xl p-1 sm:p-3">
         <Textarea
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}

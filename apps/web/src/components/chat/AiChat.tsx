@@ -10,7 +10,7 @@ export default function AiChat({ message }: { message: Message }) {
 
    const content = JSON.parse(message.content);
    return (
-      <div className="flex flex-col rounded-2xl mr-auto text-[#FAFAFA] w-fit max-w-[60%]">
+      <div className="flex flex-col rounded-2xl mr-auto text-[#FAFAFA] w-fit max-w-[85%] md:max-w-[60%]">
          <div className="px-4 py-1.5">
                      {content.text && <TextResponse value={content.text} />}
                      {content.code && <CodeResponse code={content.code} />}
