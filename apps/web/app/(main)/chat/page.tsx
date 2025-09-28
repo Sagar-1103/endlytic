@@ -25,14 +25,14 @@ export default function Page() {
   ];
 
   return (
-    <div className="relative flex flex-col h-full items-center px-4 select-none">
+    <div className="relative flex flex-col h-full items-center px-3 select-none">
       <div className="text-center pt-16">
         <Image
           className="rounded-full mx-auto mb-8 scale-220"
           src={"/endlytic-dark.svg"}
           alt="logo"
-          height={160}
-          width={160}
+          height={130}
+          width={130}
         />
         <p className="text-emerald-300 font-semibold text-3xl sm:text-4xl mb-2">
           How can I help you today?
@@ -47,7 +47,7 @@ export default function Page() {
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="bg-[#0f1411] border border-gray-700 rounded-xl p-6 text-center hover:scale-103 hover:shadow-xl transition-transform duration-300 cursor-default"
+            className="bg-[#0f1411] border border-gray-700 rounded-xl p-3 text-center hover:scale-103 hover:shadow-xl transition-transform duration-300 cursor-default"
           >
             <p className="text-emerald-400 font-semibold text-lg mb-2">
               {feature.title}

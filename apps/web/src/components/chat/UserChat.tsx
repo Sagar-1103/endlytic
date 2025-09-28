@@ -40,7 +40,7 @@ export default function UserChat({ text }: { text: string }) {
    return (
       <div className="group flex flex-col  ml-auto w-fit max-w-[85%] md:max-w-[60%]">
          {!isEditing ? (
-            <div className="rounded-2xl bg-[#303030]  text-[#FAFAFA] px-4 py-1.5">
+            <div className="rounded-2xl bg-[#303030] text-sm sm:text-base  text-[#FAFAFA] px-4 py-1.5">
                {currentQuery}
             </div>
          ) : (
