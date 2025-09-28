@@ -3,14 +3,14 @@ export default function TableResponse({
   rows,
 }: {
   headers: string[];
-  rows: string[][];
+  rows: { [key: string]: string }[];
 }) {
   return (
     <div className="overflow-x-auto my-10">
       <table className="table-auto border-collapse border border-gray-500 text-sm text-gray-200">
         <thead>
           <tr>
-            {headers.map((header, i) => (
+            {headers?.map((header, i) => (
               <th
                 key={i}
                 className="border border-gray-500 px-3 py-2 bg-gray-700"
@@ -21,11 +21,11 @@ export default function TableResponse({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {rows?.map((row, i) => (
             <tr key={i}>
-              {row.map((cell, j) => (
+              {headers?.map((header, j) => (
                 <td key={j} className="border border-gray-500 px-3 py-2">
-                  {cell}
+                  {row[header] ?? "-"}
                 </td>
               ))}
             </tr>

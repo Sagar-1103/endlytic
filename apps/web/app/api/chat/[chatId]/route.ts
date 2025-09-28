@@ -3,7 +3,7 @@ import prismaClient from "lib/db";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest,{ params }: { params: Promise<{ chatId: string }> }) {
+export async function DELETE(request: NextRequest,{ params }: { params: Promise<{ chatId: string }> }) {
     const cookieStore = await cookies();
     const tokenFromCookie = cookieStore.get('jwtToken') ?? null;
     let userId;
@@ -16,19 +16,16 @@ export async function GET(request: NextRequest,{ params }: { params: Promise<{ c
     const { payload } = await jwtVerify(tokenFromCookie.value, jwk);
     userId = (payload as JWTPayload).id as string;
     const {chatId} = await params;
-    
+
     if (!chatId) {
         return NextResponse.json({status:401,message:"Missing chat id"});
     }
-    
-    const messages = await prismaClient.message.findMany({
+
+    const deletedChat = await prismaClient.chat.delete({
         where:{
-            chatId,
-            authorId:userId,
-        },
-        orderBy:{
-            createdAt:"asc",
+            id:chatId,
         }
     })
-    return NextResponse.json({status:200,messages,message:"Collections fetched successfully"});
+
+    return NextResponse.json({status:200,deletedChat,message:"Collections fetched successfully"});
 }

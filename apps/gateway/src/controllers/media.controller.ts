@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import * as grpc from "@grpc/grpc-js";
-import { GetPresignedUrlRequest, GetPresignedUrlResponse, MediaServiceClient, MediaUploadedRequest, MediaUploadedResponse } from "@repo/proto/media";
+import { DeleteCollectionRequest, DeleteCollectionResponse, GetPresignedUrlRequest, GetPresignedUrlResponse, MediaServiceClient, MediaUploadedRequest, MediaUploadedResponse } from "@repo/proto/media";
 import { Request, Response } from "express";
 dotenv.config();
 
@@ -43,6 +43,26 @@ export const completeUpload = async(req:Request,res:Response) => {
             res.status(err.code??500).json({success:false,message:err.message});
         } else {
             res.status(201).json({sucess:true,message:response.message});
+        }
+    })
+}
+
+export const collectionDeletion = async(req:Request,res:Response) => {
+    const { collectionId } = req.params;
+
+    const authorId = req.userId;
+
+    if(!collectionId || !authorId) {
+        return res.status(401).json({success:false,message:"Missing required fields"});
+    }
+
+    const deleteCollectionRequest:DeleteCollectionRequest = {collectionId,authorId};
+
+    mediaClient.deleteCollection(deleteCollectionRequest,async(err:grpc.ServiceError | null,response:DeleteCollectionResponse)=>{
+        if(err) {
+            res.status(err.code??500).json({success:false,message:err.message});
+        } else {
+            res.status(201).json({sucess:true,deletedCollection:response.collection,message:response.message});
         }
     })
 }

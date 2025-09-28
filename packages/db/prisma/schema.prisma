@@ -30,11 +30,13 @@ model Collection {
 }
 
 model Chat {
-  id          String @id @default(uuid())
+  id          String @id
   authorId    String
   title       String?
   messages    Message[]
   user        User   @relation(fields: [authorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Role {
@@ -49,7 +51,7 @@ model Message {
   updatedAt   DateTime @updatedAt
   role        Role
   chatId      String
-  chat        Chat    @relation(fields: [chatId],references: [id])
-  authorId  String?
-  author    User?    @relation(fields: [authorId], references: [id])
+  chat        Chat    @relation(fields: [chatId],references: [id], onDelete: Cascade)
+  authorId  String
+  author    User    @relation(fields: [authorId], references: [id])
 }

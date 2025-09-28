@@ -18,7 +18,10 @@ export async function GET() {
 
     const collections = await prismaClient.collection.findMany({
         where:{
-            authorId:userId
+            authorId:userId,
+        },
+        orderBy:{
+            updatedAt:"desc",
         }
     });
 
