@@ -1,6 +1,8 @@
 import * as grpc from "@grpc/grpc-js";
 import { s3, BUCKET_NAME } from "./config/aws";
 import {
+  DeleteCollectionRequest,
+  DeleteCollectionResponse,
   GetPresignedUrlRequest,
   GetPresignedUrlResponse,
   MediaUploadedRequest,
@@ -58,7 +60,7 @@ export const mediaUploaded = async (
   try {
     const { fileName,authorId } = call.request;
 
-    if (!fileName) {
+    if (!fileName || !authorId) {
       return cb(
         {
           code: grpc.status.INVALID_ARGUMENT,
@@ -112,6 +114,67 @@ export const mediaUploaded = async (
     return cb(null, response);
   } catch (error: any) {
     console.error("Error getting uploaded media status.", error);
+    return cb({
+      code: grpc.status.INTERNAL,
+      message: "Internal Server Error: " + error.message,
+    });
+  }
+};
+
+
+export const deleteCollection = async (
+  call: grpc.ServerUnaryCall<DeleteCollectionRequest, DeleteCollectionResponse>,
+  cb: grpc.sendUnaryData<DeleteCollectionResponse>
+) => {
+  try {
+    const { collectionId,authorId } = call.request;
+
+    if (!authorId || !collectionId) {
+      return cb(
+        {
+          code: grpc.status.INVALID_ARGUMENT,
+          message: "Missing required fields.",
+        },
+        null
+      );
+    }
+
+    const collection = await prismaClient.collection.findUnique({
+      where:{
+        authorId,
+        id:collectionId,
+      }
+    })
+
+    if (!collection) {
+      return cb(
+        {
+          code: grpc.status.NOT_FOUND,
+          message: "Collection not found",
+        },
+        null
+      );
+    }
+
+    await s3.deleteObject({
+        Bucket:BUCKET_NAME,
+        Key:collection.title,
+    }).promise();
+
+    await prismaClient.collection.delete({
+      where:{
+        id:collectionId,
+      }
+    });
+
+    const response: DeleteCollectionResponse = {
+      message: "Collection deleted successfully",
+      collection,
+    };
+
+    return cb(null, response);
+  } catch (error: any) {
+    console.error("Error deleting collection.", error);
     return cb({
       code: grpc.status.INTERNAL,
       message: "Internal Server Error: " + error.message,

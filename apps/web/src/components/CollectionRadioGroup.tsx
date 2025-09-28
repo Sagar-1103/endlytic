@@ -24,11 +24,23 @@ export default function RadioGroup() {
       const response = await axios.get("/api/collections");
       const res = await response.data;
       setCollections(res.collections || []);
+      if (res.collections && res.collections.length===1 && res.collections[0]) {
+        setActiveCollection(res.collections[0]);
+        localStorage.setItem("activeCollection", JSON.stringify(res.collections[0]));
+      } else {
+        const stored = localStorage.getItem("activeCollection");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const exists = res.collections.find((c: Collection) => c.id === parsed.id);
+          if (exists) setActiveCollection(parsed);
+        }
+      }
     } catch (error) {
       console.log("Error fetching collections:", error);
       setCollections([]);
     }
   };
+
 
   useEffect(() => {
     getCollections();
@@ -38,7 +50,7 @@ export default function RadioGroup() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-[#0f1411] cursor-pointer hover:bg-[#0f1411] border-2 border-emerald-900/40">
+        <Button className="bg-[#161f19] cursor-pointer hover:bg-[#1e2e24] border-2 border-emerald-900/40">
           {activeCollection
             ? activeCollection.title.split(".postman_collection.json")[0]
             : "Select Collection"}
@@ -54,17 +66,21 @@ export default function RadioGroup() {
             const selected = collections.find((c) => c.id.toString() === val);
             if (selected) {
               setActiveCollection(selected);
+              localStorage.setItem("activeCollection", JSON.stringify(selected));
             }
           }}
         >
-          {collections.map((collection) => (
+          {collections.map((collection) => {
+            if (!collection.indexed) return;
+            return (
             <DropdownMenuRadioItem
               key={collection.id}
               value={collection.id.toString()}
             >
               {collection.title.split(".postman_collection.json")[0]}
             </DropdownMenuRadioItem>
-          ))}
+          )
+          })}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
