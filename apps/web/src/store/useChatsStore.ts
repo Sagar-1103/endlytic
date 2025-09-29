@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface Chat {
+export interface Chat {
     id:string;
     title?:string;
 };
