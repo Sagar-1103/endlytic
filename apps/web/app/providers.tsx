@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 
 export default function SessionProviderWrapper({
   children,
@@ -11,7 +11,7 @@ export default function SessionProviderWrapper({
   return (
     <SessionProvider>
       {children}
-      <Toaster duration={4000} richColors />
+      <Toaster duration={4000} theme="dark" richColors />
     </SessionProvider>
   );
 }
