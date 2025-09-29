@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useChatsStore } from "@/store/useChatsStore";
 
 interface ChatRoomBoxProps {
   title: string | null;
@@ -18,10 +19,12 @@ interface ChatRoomBoxProps {
 export default function ChatRoomBox(chat: ChatRoomBoxProps) {
   const displayTime = chat.updatedAt ? chat.updatedAt : chat.createdAt;
   const router = useRouter();
+  const { deleteChat } = useChatsStore();
 
   const handleDeleteChat = async (id: string) => {
     toast.promise(
       axios.delete(`/api/chat/${id}`).then((res) => {
+        deleteChat(id);
         router.refresh();
         return res.data;
       }),
