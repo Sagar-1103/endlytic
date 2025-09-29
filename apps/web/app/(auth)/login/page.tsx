@@ -1,9 +1,9 @@
 "use client";
-import Image from "next/image"
-import { GoogleLogo, DiscordLogo, GithubLogo, GitlabLogo } from "public/icons";
-import { useSession, signIn, signOut } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { providers } from "@/data/provider-data";
 
 export default function Login() {
   const router = useRouter();
@@ -12,33 +12,43 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault()
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-    if (!res?.ok) {
-      setError(res?.error || "Sign in failed")
-    } else {
-      router.push("/chat");
-    }
+    e.preventDefault();
+    toast.promise(
+      signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      }).then((res) => {
+        if (!res?.ok) {
+          setError(res?.error || "Sign in failed")
+          throw new Error(res?.error || "Sign in failed");
+        }
+        router.push("/chat");
+        return res;
+      }),
+      {
+        loading: "Logging in...",
+        success: "Logged in successfully! Redirecting...",
+        error: (err:any) => err.message || "Failed to login",
+      }
+    );
+  };
 
-  }
 
   return (
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-white">
         <div className="w-full max-w-sm">
 
-          <h2 className="text-2xl font-semibold">Log in to your account</h2>
+          <h2 className="text-2xl font-semibold">Log in to your Endlytic account</h2>
           <p className="mt-2 text-[#BFBFBF]">Connect to Endlytic with:</p>
 
 
           <div className="mt-3 grid md:grid-cols-2 gap-4">
-            <Card title="Google" logo={<GoogleLogo />} id="google" />
-            <Card title="GitHub" logo={<GithubLogo />} id="github" />
-            <Card title="Discord" logo={<DiscordLogo />} id="discord" />
-            <Card title="GitLab" logo={<GitlabLogo />} id="gitlab" />
+            {
+              providers.map((provider)=>(
+                <Card key={provider.id} title={provider.title} logo={provider.logo} id={provider.id} />
+              ))
+            }
           </div>
 
 
@@ -116,7 +126,7 @@ function Card({ title, logo, id }: { title: string; logo: string | React.ReactNo
     <button
       type="button"
       onClick={() => signIn(id, { callbackUrl: "/chat" })}
-      className="flex items-center justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-105 hover:shadow-md active:scale-95">
+      className="flex items-center cursor-pointer justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-102 hover:shadow-md active:scale-95">
       {logo}
       <span className="text-sm font-medium">{title}</span>
     </button>

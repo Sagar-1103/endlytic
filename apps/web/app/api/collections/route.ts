@@ -1,16 +1,27 @@
+import { importJWK, JWTPayload, jwtVerify } from "jose";
 import prismaClient from "lib/db";
-import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const session = await getServerSession();
-    if (!session?.user) {
+    const cookieStore = await cookies();
+    const tokenFromCookie = cookieStore.get('jwtToken') ?? null;
+    let userId;
+    const secret = process.env.JWT_SECRET || '';
+    const jwk = await importJWK({ k: secret, alg: 'HS256', kty: 'oct' });
+    if (!tokenFromCookie) {
         return NextResponse.json({status:409,message:"You are not authenticated"});
     }
 
+    const { payload } = await jwtVerify(tokenFromCookie.value, jwk);
+    userId = (payload as JWTPayload).id as string;
+
     const collections = await prismaClient.collection.findMany({
         where:{
-            authorId:session.user.id
+            authorId:userId,
+        },
+        orderBy:{
+            updatedAt:"desc",
         }
     });
 

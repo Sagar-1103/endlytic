@@ -11,7 +11,9 @@ import {
   type ChannelCredentials,
   Client,
   type ClientOptions,
+  type ClientReadableStream,
   type ClientUnaryCall,
+  type handleServerStreamingCall,
   type handleUnaryCall,
   makeGenericClientConstructor,
   type Metadata,
@@ -20,6 +22,20 @@ import {
 } from "@grpc/grpc-js";
 
 export const protobufPackage = "media";
+
+export interface DeleteCollectionRequest {
+  authorId: string;
+  collectionId: string;
+}
+
+export interface Collection {
+  id: string;
+}
+
+export interface DeleteCollectionResponse {
+  message: string;
+  collection: Collection | undefined;
+}
 
 export interface GetPresignedUrlRequest {
   fileName: string;
@@ -39,6 +55,229 @@ export interface MediaUploadedRequest {
 export interface MediaUploadedResponse {
   message: string;
 }
+
+export interface CollectionQueryRequest {
+  query: string;
+  collectionId: string;
+  authorId: string;
+  chatId?: string | undefined;
+}
+
+export interface CollectionQueryResponse {
+  jsonData: string;
+}
+
+function createBaseDeleteCollectionRequest(): DeleteCollectionRequest {
+  return { authorId: "", collectionId: "" };
+}
+
+export const DeleteCollectionRequest: MessageFns<DeleteCollectionRequest> = {
+  encode(message: DeleteCollectionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.authorId !== "") {
+      writer.uint32(10).string(message.authorId);
+    }
+    if (message.collectionId !== "") {
+      writer.uint32(26).string(message.collectionId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteCollectionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteCollectionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.authorId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.collectionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteCollectionRequest {
+    return {
+      authorId: isSet(object.authorId) ? globalThis.String(object.authorId) : "",
+      collectionId: isSet(object.collectionId) ? globalThis.String(object.collectionId) : "",
+    };
+  },
+
+  toJSON(message: DeleteCollectionRequest): unknown {
+    const obj: any = {};
+    if (message.authorId !== "") {
+      obj.authorId = message.authorId;
+    }
+    if (message.collectionId !== "") {
+      obj.collectionId = message.collectionId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteCollectionRequest>, I>>(base?: I): DeleteCollectionRequest {
+    return DeleteCollectionRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteCollectionRequest>, I>>(object: I): DeleteCollectionRequest {
+    const message = createBaseDeleteCollectionRequest();
+    message.authorId = object.authorId ?? "";
+    message.collectionId = object.collectionId ?? "";
+    return message;
+  },
+};
+
+function createBaseCollection(): Collection {
+  return { id: "" };
+}
+
+export const Collection: MessageFns<Collection> = {
+  encode(message: Collection, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Collection {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollection();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Collection {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: Collection): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Collection>, I>>(base?: I): Collection {
+    return Collection.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Collection>, I>>(object: I): Collection {
+    const message = createBaseCollection();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteCollectionResponse(): DeleteCollectionResponse {
+  return { message: "", collection: undefined };
+}
+
+export const DeleteCollectionResponse: MessageFns<DeleteCollectionResponse> = {
+  encode(message: DeleteCollectionResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    if (message.collection !== undefined) {
+      Collection.encode(message.collection, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteCollectionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteCollectionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.collection = Collection.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteCollectionResponse {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      collection: isSet(object.collection) ? Collection.fromJSON(object.collection) : undefined,
+    };
+  },
+
+  toJSON(message: DeleteCollectionResponse): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.collection !== undefined) {
+      obj.collection = Collection.toJSON(message.collection);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteCollectionResponse>, I>>(base?: I): DeleteCollectionResponse {
+    return DeleteCollectionResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteCollectionResponse>, I>>(object: I): DeleteCollectionResponse {
+    const message = createBaseDeleteCollectionResponse();
+    message.message = object.message ?? "";
+    message.collection = (object.collection !== undefined && object.collection !== null)
+      ? Collection.fromPartial(object.collection)
+      : undefined;
+    return message;
+  },
+};
 
 function createBaseGetPresignedUrlRequest(): GetPresignedUrlRequest {
   return { fileName: "", fileType: "" };
@@ -326,6 +565,172 @@ export const MediaUploadedResponse: MessageFns<MediaUploadedResponse> = {
   },
 };
 
+function createBaseCollectionQueryRequest(): CollectionQueryRequest {
+  return { query: "", collectionId: "", authorId: "", chatId: undefined };
+}
+
+export const CollectionQueryRequest: MessageFns<CollectionQueryRequest> = {
+  encode(message: CollectionQueryRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.query !== "") {
+      writer.uint32(10).string(message.query);
+    }
+    if (message.collectionId !== "") {
+      writer.uint32(18).string(message.collectionId);
+    }
+    if (message.authorId !== "") {
+      writer.uint32(26).string(message.authorId);
+    }
+    if (message.chatId !== undefined) {
+      writer.uint32(34).string(message.chatId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CollectionQueryRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollectionQueryRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.query = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.collectionId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.authorId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CollectionQueryRequest {
+    return {
+      query: isSet(object.query) ? globalThis.String(object.query) : "",
+      collectionId: isSet(object.collectionId) ? globalThis.String(object.collectionId) : "",
+      authorId: isSet(object.authorId) ? globalThis.String(object.authorId) : "",
+      chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : undefined,
+    };
+  },
+
+  toJSON(message: CollectionQueryRequest): unknown {
+    const obj: any = {};
+    if (message.query !== "") {
+      obj.query = message.query;
+    }
+    if (message.collectionId !== "") {
+      obj.collectionId = message.collectionId;
+    }
+    if (message.authorId !== "") {
+      obj.authorId = message.authorId;
+    }
+    if (message.chatId !== undefined) {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CollectionQueryRequest>, I>>(base?: I): CollectionQueryRequest {
+    return CollectionQueryRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CollectionQueryRequest>, I>>(object: I): CollectionQueryRequest {
+    const message = createBaseCollectionQueryRequest();
+    message.query = object.query ?? "";
+    message.collectionId = object.collectionId ?? "";
+    message.authorId = object.authorId ?? "";
+    message.chatId = object.chatId ?? undefined;
+    return message;
+  },
+};
+
+function createBaseCollectionQueryResponse(): CollectionQueryResponse {
+  return { jsonData: "" };
+}
+
+export const CollectionQueryResponse: MessageFns<CollectionQueryResponse> = {
+  encode(message: CollectionQueryResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.jsonData !== "") {
+      writer.uint32(10).string(message.jsonData);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CollectionQueryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollectionQueryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.jsonData = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CollectionQueryResponse {
+    return { jsonData: isSet(object.jsonData) ? globalThis.String(object.jsonData) : "" };
+  },
+
+  toJSON(message: CollectionQueryResponse): unknown {
+    const obj: any = {};
+    if (message.jsonData !== "") {
+      obj.jsonData = message.jsonData;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CollectionQueryResponse>, I>>(base?: I): CollectionQueryResponse {
+    return CollectionQueryResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CollectionQueryResponse>, I>>(object: I): CollectionQueryResponse {
+    const message = createBaseCollectionQueryResponse();
+    message.jsonData = object.jsonData ?? "";
+    return message;
+  },
+};
+
 export type MediaServiceService = typeof MediaServiceService;
 export const MediaServiceService = {
   getPresignedUrl: {
@@ -349,11 +754,35 @@ export const MediaServiceService = {
       Buffer.from(MediaUploadedResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): MediaUploadedResponse => MediaUploadedResponse.decode(value),
   },
+  collectionQuery: {
+    path: "/media.MediaService/CollectionQuery",
+    requestStream: false,
+    responseStream: true,
+    requestSerialize: (value: CollectionQueryRequest): Buffer =>
+      Buffer.from(CollectionQueryRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CollectionQueryRequest => CollectionQueryRequest.decode(value),
+    responseSerialize: (value: CollectionQueryResponse): Buffer =>
+      Buffer.from(CollectionQueryResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CollectionQueryResponse => CollectionQueryResponse.decode(value),
+  },
+  deleteCollection: {
+    path: "/media.MediaService/DeleteCollection",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: DeleteCollectionRequest): Buffer =>
+      Buffer.from(DeleteCollectionRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeleteCollectionRequest => DeleteCollectionRequest.decode(value),
+    responseSerialize: (value: DeleteCollectionResponse): Buffer =>
+      Buffer.from(DeleteCollectionResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): DeleteCollectionResponse => DeleteCollectionResponse.decode(value),
+  },
 } as const;
 
 export interface MediaServiceServer extends UntypedServiceImplementation {
   getPresignedUrl: handleUnaryCall<GetPresignedUrlRequest, GetPresignedUrlResponse>;
   mediaUploaded: handleUnaryCall<MediaUploadedRequest, MediaUploadedResponse>;
+  collectionQuery: handleServerStreamingCall<CollectionQueryRequest, CollectionQueryResponse>;
+  deleteCollection: handleUnaryCall<DeleteCollectionRequest, DeleteCollectionResponse>;
 }
 
 export interface MediaServiceClient extends Client {
@@ -386,6 +815,30 @@ export interface MediaServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: MediaUploadedResponse) => void,
+  ): ClientUnaryCall;
+  collectionQuery(
+    request: CollectionQueryRequest,
+    options?: Partial<CallOptions>,
+  ): ClientReadableStream<CollectionQueryResponse>;
+  collectionQuery(
+    request: CollectionQueryRequest,
+    metadata?: Metadata,
+    options?: Partial<CallOptions>,
+  ): ClientReadableStream<CollectionQueryResponse>;
+  deleteCollection(
+    request: DeleteCollectionRequest,
+    callback: (error: ServiceError | null, response: DeleteCollectionResponse) => void,
+  ): ClientUnaryCall;
+  deleteCollection(
+    request: DeleteCollectionRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: DeleteCollectionResponse) => void,
+  ): ClientUnaryCall;
+  deleteCollection(
+    request: DeleteCollectionRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: DeleteCollectionResponse) => void,
   ): ClientUnaryCall;
 }
 

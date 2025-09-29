@@ -1,10 +1,10 @@
 "use client"
-import Image from "next/image"
-import { GoogleLogo, DiscordLogo, GithubLogo, GitlabLogo } from "public/icons";
 import { signIn } from "next-auth/react"
 import { useState } from "react";
 import { signUp } from "app/actions/auth";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { providers } from "@/data/provider-data";
 
 export default function Signup() {
   const router = useRouter();
@@ -12,29 +12,35 @@ export default function Signup() {
   const [password, setPassword] = useState("")
   const [error , setError] = useState("");
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault()
-    const signUpResult = await signUp({ email, password });
-
-    if (signUpResult.error) {
-      setError(signUpResult.error)
-      console.log(signUpResult.error)
-      return
+ const handleSubmit = async (e: any) => {
+  e.preventDefault();
+  toast.promise(
+    (async () => {
+      const signUpResult = await signUp({ email, password });
+      if (signUpResult.error) {
+        setError(signUpResult.error || "Sign up failed");
+        throw new Error(signUpResult.error);
+      }
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (signInResult?.error) {
+        setError(signInResult.error || "Sign in failed");
+        throw new Error(signInResult.error);
+      }
+      router.push("/");
+      return "Account created and logged in!";
+    })(),
+    {
+      loading: "Creating account...",
+      success: (msg) => msg,
+      error: (err) => err.message || "Failed to create account",
     }
+  );
+};
 
-    const signInResult = await signIn("credentials", {
-      email: email,
-      password:password,
-      redirect: false,
-    });
-
-    if (signInResult?.error) {
-      setError(signInResult?.error)
-      console.log(signInResult?.error)
-      return;
-    }
-    router.push("/");
-  }
 
   return (
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-white">
@@ -45,10 +51,11 @@ export default function Signup() {
 
 
           <div className="mt-3 grid md:grid-cols-1 gap-4">
-            <Card title="Google" logo={<GoogleLogo />} id="google" />
-            <Card title="GitHub" logo={<GithubLogo />} id="github" />
-            <Card title="Discord" logo={<DiscordLogo />} id="discord" />
-            <Card title="GitLab" logo={<GitlabLogo />} id="gitlab" />
+            {
+              providers.map((provider)=>(
+                <Card key={provider.id} title={provider.title} logo={provider.logo} id={provider.id} />
+              ))
+            }
           </div>
 
 
@@ -71,7 +78,7 @@ export default function Signup() {
                 id="email"
                 name="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {setEmail(e.target.value),setError("")}}
                 required
                 className="mt-1 w-full rounded-md border border-[#848282] px-3 py-2 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-0 focus:ring-gray-500"
                 placeholder="youremail@email.com"
@@ -90,7 +97,7 @@ export default function Signup() {
                 id="password"
                 name="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {setPassword(e.target.value),setError("")}}
                 required
                 className="mt-1 w-full rounded-md border border-[#848282] px-3 py-2 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
                 placeholder="Enter a unique password"
@@ -126,7 +133,7 @@ function Card({ title, logo, id }: { title: string; logo: string | React.ReactNo
     <button
       type="button"
       onClick={() => signIn(id, { callbackUrl: "/chat" })}
-      className="flex items-center justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-105 hover:shadow-md active:scale-95">
+      className="flex cursor-pointer items-center justify-center gap-2 rounded-md bg-white py-[5px] px-3 text-black transition hover:scale-102 hover:shadow-md active:scale-95">
       {logo}
       <span className="text-sm font-medium">{title}</span>
     </button>

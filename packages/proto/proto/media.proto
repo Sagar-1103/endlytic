@@ -5,6 +5,22 @@ package media;
 service MediaService {
     rpc GetPresignedUrl (GetPresignedUrlRequest) returns (GetPresignedUrlResponse);
     rpc MediaUploaded (MediaUploadedRequest) returns (MediaUploadedResponse);
+    rpc CollectionQuery (CollectionQueryRequest) returns (stream CollectionQueryResponse);
+    rpc DeleteCollection (DeleteCollectionRequest) returns (DeleteCollectionResponse);
+}
+
+message DeleteCollectionRequest {
+    string authorId = 1;
+    string collectionId = 3;
+}
+
+message Collection {
+    string id = 1;
+}
+
+message DeleteCollectionResponse {
+    string message = 1;
+    Collection collection = 2;
 }
 
 message GetPresignedUrlRequest {
@@ -24,4 +40,15 @@ message MediaUploadedRequest {
 
 message MediaUploadedResponse {
     string message = 2;
+}
+
+message CollectionQueryRequest {
+    string query= 1;
+    string collectionId= 2;
+    string authorId=3;
+    optional string chatId=4;
+}
+
+message CollectionQueryResponse {
+  string jsonData = 1;
 }

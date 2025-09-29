@@ -1,7 +1,5 @@
 'use server'
 
-// app/api/auth/signup/route.ts
-import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import prismaClient from "lib/db"
 
