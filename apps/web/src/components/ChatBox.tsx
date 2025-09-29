@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { ArrowUpCircle, Mic, Paperclip } from "lucide-react";
 import RadioGroup from "./CollectionRadioGroup";
@@ -18,6 +18,46 @@ export default function ChatBox() {
   const { addMessage } = useChatMessagesStore();
   const { setChatTitle } = useChatTitleStore();
   const { setIsStreaming } = useIsStreamingStore();
+  const [listening, setListening] = useState(false);
+  const [recognition, setRecognition] = useState<any | null>(null);
+
+  useEffect(() => {
+    // Setup speech recognition
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("Speech Recognition not supported in this browser.");
+      return;
+    }
+
+    const recog = new SpeechRecognition();
+    recog.continuous = false; // stops after user pauses
+    recog.interimResults = false; // only final results
+    recog.lang = "en-US";
+
+    recog.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setChatInput(transcript); // <-- update your input
+      setListening(false);
+    };
+
+    recog.onerror = () => {
+      setListening(false);
+    };
+
+    setRecognition(recog);
+  }, [setChatInput]);
+
+  const toggleListening = () => {
+    if (!recognition) return;
+    if (listening) {
+      recognition.stop();
+      setListening(false);
+    } else {
+      recognition.start();
+      setListening(true);
+    }
+  };
 
   const handleSendMessage = async () => {
     try {
@@ -31,7 +71,7 @@ export default function ChatBox() {
         router.push(`/chat/${chatId}`);
       }
       setChatInput("");
-      addMessage("User",JSON.stringify({text:chatInput}));
+      addMessage("User", JSON.stringify({ text: chatInput }));
       setIsStreaming(true);
 
       const response = await fetch(url, {
@@ -40,7 +80,7 @@ export default function ChatBox() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.jwtToken}`,
         },
-        body: JSON.stringify({ query: chatInput,collectionId:activeCollection.id,chatId:chatId }),
+        body: JSON.stringify({ query: chatInput, collectionId: activeCollection.id, chatId: chatId }),
       });
 
       if (!response.body) return;
@@ -54,7 +94,7 @@ export default function ChatBox() {
         done = readerDone;
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          addMessage("Ai",chunk);
+          addMessage("Ai", chunk);
           try {
             result = JSON.parse(chunk);
           } catch (error) {
@@ -76,35 +116,39 @@ export default function ChatBox() {
         <RadioGroup />
       </div>
       <div className="pb-4 w-[88%] sm:w-[80%] max-w-[75rem] sm:mx-auto  bg-[#0f1411]">
-      <div className="w-full w-min-[0] border-2 border-emerald-900/20 bg-[#161f19] mx-auto rounded-2xl p-3">
-        <Textarea
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          className="border-none focus-visible:ring-0 resize-none outline-none text-white placeholder-gray-400 w-full md:text-md max-h-[250px] overflow-y-auto custom-scrollbar"
-          placeholder="Ask me anything about your API..."
-        />
+        <div className="w-full w-min-[0] border-2 border-emerald-900/20 bg-[#161f19] mx-auto rounded-2xl p-3">
+          <Textarea
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            className="border-none focus-visible:ring-0 resize-none outline-none text-white placeholder-gray-400 w-full md:text-md max-h-[250px] overflow-y-auto custom-scrollbar"
+            placeholder="Ask me anything about your API..."
+          />
 
-        <div className="flex justify-between items-center mt-2">
-          <UploadDialog>
-            <button className="p-2 cursor-pointer hover:bg-gray-600/30 rounded-md transition">
-              <Paperclip className="text-white w-5 h-5" />
-            </button>
-          </UploadDialog>
+          <div className="flex justify-between items-center mt-2">
+            <UploadDialog>
+              <button className="p-2 cursor-pointer hover:bg-gray-600/30 rounded-md transition">
+                <Paperclip className="text-white w-5 h-5" />
+              </button>
+            </UploadDialog>
 
-          <div className="flex gap-2">
-            <button className="p-2 cursor-pointer hover:bg-gray-600/30 rounded-md transition">
-              <Mic className="text-white w-5 h-5" />
-            </button>
-            <button
-              disabled={activeCollection && chatInput ? false : true}
-              onClick={handleSendMessage}
-              className={`p-2 bg-gradient-to-b ${activeCollection && chatInput.length ? "from-emerald-300 to-emerald-400 hover:from-emerald-500 cursor-pointer" : "from-emerald-300/30 to-emerald-300/30"} rounded-md transition`}
-            >
-              <ArrowUpCircle className="text-black  w-5 h-5" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={toggleListening}
+                className={`p-2 cursor-pointer rounded-md transition ${listening ? "bg-red-600/50" : "hover:bg-gray-600/30"
+                  }`}
+              >
+                <Mic className="text-white w-5 h-5" />
+              </button>
+              <button
+                disabled={activeCollection && chatInput ? false : true}
+                onClick={handleSendMessage}
+                className={`p-2 bg-gradient-to-b ${activeCollection && chatInput.length ? "from-emerald-300 to-emerald-400 hover:from-emerald-500 cursor-pointer" : "from-emerald-300/30 to-emerald-300/30"} rounded-md transition`}
+              >
+                <ArrowUpCircle className="text-black  w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ export default function Login() {
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-white">
         <div className="w-full max-w-sm">
 
-          <h2 className="text-2xl font-semibold">Log in to your account</h2>
+          <h2 className="text-2xl font-semibold">Log in to your Endlytic account</h2>
           <p className="mt-2 text-[#BFBFBF]">Connect to Endlytic with:</p>
 
 

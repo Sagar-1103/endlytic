@@ -17,11 +17,11 @@ export const items: { title: string; url: string; icon: React.ReactNode }[] = [
     icon: <BookCopy className="w-5 h-5" />,
   },
 
-  {
-    title: "Integrations",
-    url: "/integrations",
-    icon: <Workflow className="w-5 h-5" />,
-  },
+  // {
+  //   title: "Integrations",
+  //   url: "/integrations",
+  //   icon: <Workflow className="w-5 h-5" />,
+  // },
 ];
 
 export const chats:{id:number,title:string}[] = [
