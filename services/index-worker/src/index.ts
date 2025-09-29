@@ -17,7 +17,9 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 const pinecone = new PineconeClient();
 const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX!);
 
-amqp.connect("amqp://localhost",function(error0:Error,connection:Connection) {
+const rabbitMqUrl = process.env.RABBITMQ_URL || "amqp://localhost";
+
+amqp.connect(rabbitMqUrl,function(error0:Error,connection:Connection) {
     if(error0){
         console.error("Failed to connect RabbitMQ:", error0.message);
         process.exit(1);

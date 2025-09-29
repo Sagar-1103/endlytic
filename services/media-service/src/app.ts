@@ -13,6 +13,8 @@ import amqp from "amqplib/callback_api";
 import dotenv from "dotenv";
 dotenv.config();
 
+const rabbitMqUrl = process.env.RABBITMQ_URL || "amqp://localhost";
+
 export const getPresignedUrl = async (
   call: grpc.ServerUnaryCall<GetPresignedUrlRequest, GetPresignedUrlResponse>,
   cb: grpc.sendUnaryData<GetPresignedUrlResponse>
@@ -94,7 +96,7 @@ export const mediaUploaded = async (
     }
 
     // push the url into the queue to be consumed for indexing 
-    amqp.connect("amqp://localhost",function(error0,connection){
+    amqp.connect(rabbitMqUrl,function(error0,connection){
       if (error0) {
         console.log("RabbitMQ connection error:", error0);
         return cb(
