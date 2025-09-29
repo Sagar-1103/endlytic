@@ -12,13 +12,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Upload, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from "sonner";
 
 interface UploadDialogProps {
   children: React.ReactNode;
@@ -41,56 +40,58 @@ export function UploadDialog({ children }: UploadDialogProps) {
 
   const handleUpload = async () => {
     if (!file) return;
-
-    setUploading(true);
     const uuid = uuidv4();
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/presigned-url?fileName=${file.name}-${uuid}&fileType=${file.type}`,
-        {
-          headers: {
-            Authorization: `Bearer ${data?.jwtToken}`,
-          },
-        }
-      );
 
-      const url = response.data.url;
+    toast.promise(
+      (async () => {
+        setUploading(true);
 
-      await axios.put(url, file, {
-        headers: {
-          "Content-Type": file.type,
-        },
-        onUploadProgress: (event) => {
-          if (event.total) {
-            const percent = Math.round((event.loaded * 100) / event.total);
-            setProgress(percent);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/presigned-url?fileName=${file.name}-${uuid}&fileType=${file.type}`,
+          {
+            headers: {
+              Authorization: `Bearer ${data?.jwtToken}`,
+            },
           }
-        },
-      });
+        );
+        const url = response.data.url;
 
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/complete`,
-        { fileName: `${file.name}-${uuid}` },
-        {
+        await axios.put(url, file, {
           headers: {
-            Authorization: `Bearer ${data?.jwtToken}`,
+            "Content-Type": file.type,
           },
-        }
-      );
+          onUploadProgress: (event) => {
+            if (event.total) {
+              const percent = Math.round((event.loaded * 100) / event.total);
+              setProgress(percent);
+            }
+          },
+        });
 
-      setProgress(100);
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/complete`,
+          { fileName: `${file.name}-${uuid}` },
+          {
+            headers: {
+              Authorization: `Bearer ${data?.jwtToken}`,
+            },
+          }
+        );
+        setProgress(100);
 
-      setTimeout(() => {
-        setUploading(false);
-        setFile(null);
-        setOpen(false);
-        router.refresh();
-      }, 800);
-    } catch (err) {
-      console.error("Upload failed:", err);
-      setUploading(false);
+        setTimeout(() => {
+          setUploading(false);
+          setFile(null);
+          setOpen(false);
+          router.refresh();
+        }, 800);
+        return `${file.name?.split(".postman_collection.json")?.[0]} uploaded successfully`;
+      })(),{
+      success: (msg) => msg,
+      error: "Upload failed",
     }
-  };
+    )
+  }
 
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
@@ -111,7 +112,6 @@ export function UploadDialog({ children }: UploadDialogProps) {
       setProgress(0);
     }
   };
-
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -159,7 +159,7 @@ export function UploadDialog({ children }: UploadDialogProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-200 hover:!bg-gray-400 "
+                className="text-gray-200 cursor-pointer hover:!bg-gray-400 "
                 onClick={() => setFile(null)}
               >
                 <X size={20} />
@@ -179,12 +179,16 @@ export function UploadDialog({ children }: UploadDialogProps) {
         </div>
 
 
-        <DialogFooter className="sm:justify-between mt-6 sm:max-w-[400px]">
+        <DialogFooter className="sm:justify-end mt-6 sm:max-w-[400px]">
           <DialogClose asChild>
             <Button
               type="button"
               variant="secondary"
-              className="bg-gray-700 text-gray-200 hover:bg-gray-600"
+              onClick={()=>{
+                setOpen(false);
+                setFile(null);
+              }}
+              className="bg-gray-700 cursor-pointer text-gray-200 hover:bg-gray-600"
             >
               Close
             </Button>
@@ -193,7 +197,7 @@ export function UploadDialog({ children }: UploadDialogProps) {
             type="button"
             disabled={!file || uploading}
             onClick={handleUpload}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-500"
+            className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 cursor-pointer"
           >
             <Upload size={18} />
             {uploading ? "Uploading..." : "Upload"}

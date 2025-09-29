@@ -1,28 +1,13 @@
 "use client";
 import { usePathname } from "next/navigation";
 import SidebarChatItem from "./SidebarChatItem";
-import { useEffect, useState } from "react";
-
-export interface Chat {
-  id: string;
-  title: string | null;
-  authorId: string;
-}
+import { useEffect } from "react";
+import { useChatsStore } from "@/store/useChatsStore";
 
 export default function SidebarChats() {
   const pathName = usePathname();
-  const [chats,setChats] = useState<Chat[]>([]);
+  const { chats, getChats } = useChatsStore();
 
-  const getChats = async()=>{
-    try {
-      const response = await fetch("/api/chats");
-      const res = await response.json();
-      setChats(res.chats);
-            
-    } catch (error) {
-      console.log(error);
-    }
-  }
   useEffect(()=>{
     getChats();
   },[])
@@ -34,7 +19,7 @@ export default function SidebarChats() {
       </p>
       <div className="h-[33vh] overflow-y-auto custom-scrollbar">
       <div className="flex flex-col gap-1">
-        {chats.length!==0 && chats.map((chat) => (
+        {chats && chats.length!==0 && chats.map((chat) => (
           <SidebarChatItem isActive={pathName===`/chat/${chat.id}`} key={chat.id} chat={chat} />
         ))}
       </div>

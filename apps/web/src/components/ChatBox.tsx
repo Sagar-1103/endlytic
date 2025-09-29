@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
 import { useActiveCollectionStore, useChatMessagesStore, useChatTitleStore } from "@/store/useStore";
 import { v4 as uuidv4 } from 'uuid';
-import { useIsStreamingStore } from "@/store/useChatsStore";
+import { useChatsStore, useIsStreamingStore } from "@/store/useChatsStore";
 
 export default function ChatBox() {
   const [chatInput, setChatInput] = useState("");
@@ -58,6 +58,7 @@ export default function ChatBox() {
       setListening(true);
     }
   };
+  const { addChat } = useChatsStore();
 
   const handleSendMessage = async () => {
     try {
@@ -68,6 +69,7 @@ export default function ChatBox() {
       const chatId = pathname.split("/chat/")?.[1] || uuidv4();
       if (!pathname.split("/chat/")?.[1]) {
         localStorage.setItem("newId", chatId);
+
         router.push(`/chat/${chatId}`);
       }
       setChatInput("");
@@ -88,6 +90,7 @@ export default function ChatBox() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let done = false;
+      let newChatCreated = false;
       let result;
       while (!done) {
         const { value, done: readerDone } = await reader.read();
@@ -97,13 +100,18 @@ export default function ChatBox() {
           addMessage("Ai", chunk);
           try {
             result = JSON.parse(chunk);
+            if(!newChatCreated && result && result.title) {
+              newChatCreated = true;
+              addChat(chatId,result.title);
+              setChatTitle(result.title);
+            }
+            
           } catch (error) {
             console.log("error parsing chunk");
           }
         }
       }
 
-      setChatTitle(result.title)
       setIsStreaming(false);
     } catch (error) {
       console.log(error);
