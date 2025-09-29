@@ -145,15 +145,17 @@ export default function AppSidebar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     side="top"
-                    className="w-[260px] bg-[#232733] border-0 text-white"
+                    className="w-[260px] bg-[#0E1A14] border border-[#1A2B22]/50 text-white"
                   >
-                    <DropdownMenuItem className="hover:!bg-[#353c4f] !text-white">
-                      <div className=" flex flex-row gap-2">
+                    <DropdownMenuItem className=" !text-[#E5E5E5] hover:!bg-[#0E1A14]">
+                      <div className=" flex flex-row gap-2"
+                        onClick={() => navigator.clipboard.writeText(user.email)}
+                      >
                         <div className="flex items-center"><ProfileIcon /></div>
                         <span className="text-sm mb-[2px]">{user.email}</span>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:!bg-[#353c4f] !text-white"
+                    <DropdownMenuItem className="hover:!bg-[#22C55E]/10 !text-[#E5E5E5] hover:!text-emerald-300"
                       onClick={() => { setSettingModal(!settingModal) 
                       }}
                     >
@@ -162,7 +164,7 @@ export default function AppSidebar() {
                         <span className="text-sm  mb-[2px]">Settings</span>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:!bg-[#353c4f] !text-white">
+                    <DropdownMenuItem className="hover:!bg-[#22C55E]/10 !text-[#E5E5E5] hover:!text-emerald-300">
                       <div className=" flex flex-row gap-2"
                         onClick={handleLogout}
                       >

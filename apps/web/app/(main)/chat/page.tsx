@@ -26,7 +26,7 @@ export default function Page() {
 
   return (
     <div className="relative flex flex-col h-full items-center px-3 select-none">
-      <div className="text-center pt-16">
+      <div className="text-center pt-0">
         <Image
           className="rounded-full mx-auto mb-8 scale-220"
           src={"/endlytic-dark.svg"}
@@ -43,9 +43,9 @@ export default function Page() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl w-full mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl w-full mb-16 pb-52 sm:pb-40">
         {features.map((feature) => (
-          <div
+          <div 
             key={feature.title}
             className="bg-[#0f1411] border border-gray-700 rounded-xl p-3 text-center hover:scale-103 hover:shadow-xl transition-transform duration-300 cursor-default"
           >

@@ -57,8 +57,8 @@ export default function RadioGroup() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Choose Collection</DropdownMenuLabel>
+      <DropdownMenuContent className="w-56 bg-[#0E1A14] border border-[#1A2B22]">
+        <DropdownMenuLabel className="!text-[#E5E5E5] ">Choose Collection</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={activeCollection?.id?.toString() || ""}
@@ -76,6 +76,7 @@ export default function RadioGroup() {
             <DropdownMenuRadioItem
               key={collection.id}
               value={collection.id.toString()}
+              className="!text-[#E5E5E5] hover:!bg-[#22C55E]/10 hover:!text-emerald-300"
             >
               {collection.title.split(".postman_collection.json")[0]}
             </DropdownMenuRadioItem>
