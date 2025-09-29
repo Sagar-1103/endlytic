@@ -75,35 +75,64 @@ export const mediaUploaded = async (
         authorId:authorId,
         title:fileName,
       }
-    })
+    });
+
+    if(!collection) {
+      return cb(
+        {
+          code: grpc.status.NOT_FOUND,
+          message: "Collection Found.",
+        },
+        null
+      );
+    }
+
+    const message = {
+      url:`https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
+      id:collection.id,
+      userId:authorId,
+    }
 
     // push the url into the queue to be consumed for indexing 
     amqp.connect("amqp://localhost",function(error0,connection){
-      if(error0){
-        throw error0;
+      if (error0) {
+        console.log("RabbitMQ connection error:", error0);
+        return cb(
+          {
+            code: grpc.status.UNAVAILABLE,
+            message: "Failed to connect to RabbitMQ.",
+          },
+          null
+        );
       }
 
-      connection.createChannel(function(erro1,channel){
-        if(erro1){
-          throw erro1;
+      connection.createChannel(function(error1,channel){
+        if (error1) {
+          console.error("RabbitMQ channel error:", error1);
+          connection.close();
+          return cb(
+            {
+              code: grpc.status.UNAVAILABLE,
+              message: "Failed to create RabbitMQ channel.",
+            },
+            null
+          );
         }
 
         const queue = "collections";
-        const message = {
-          url:`https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
-          id:collection.id,
-          userId:authorId,
-        }
 
         channel.assertQueue(queue,{
           durable:true,
         });
 
         channel.sendToQueue(queue,Buffer.from(JSON.stringify(message)),{persistent:true});
-        // console.log(" [x] Sent '%s'", message);
       });
       setTimeout(() => {
-        connection.close();
+        try {
+            connection.close();
+        } catch (closeErr) {
+          console.warn("Failed to close RabbitMQ connection:", closeErr);
+        }
       }, 500);
     })
 

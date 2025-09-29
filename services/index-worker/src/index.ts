@@ -19,11 +19,13 @@ const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX!);
 
 amqp.connect("amqp://localhost",function(error0:Error,connection:Connection) {
     if(error0){
-        throw error0;
+        console.error("Failed to connect RabbitMQ:", error0.message);
+        process.exit(1);
     }
     connection.createChannel(async function(error1,channel) {
         if(error1){
-            throw error1;
+            console.error("Failed to create RabbitMQ channel:", error1.message);
+            process.exit(1);
         }
         const queue = "collections";
 
@@ -33,26 +35,40 @@ amqp.connect("amqp://localhost",function(error0:Error,connection:Connection) {
 
         channel.prefetch(1);
         console.log("[*] Waiting for messages in %s. To exit press CTRL+C", queue);
-        const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
+
+        let vectorStore;
+        try {
+            vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
             pineconeIndex,
             maxConcurrency: 5,
         });
+        } catch (error:any) {
+          console.error("[Pinecone] Failed to initialize vector store:", error.message);
+          process.exit(1);
+        }
 
         channel.consume(queue,async function(message){
             if(message){
-                const {id,url,userId} = JSON.parse(message.content.toString());
-                const parsedCollection = await splitCollection(url,id,vectorStore,userId);
-                await prismaClient.collection.update({
-                    where:{
-                        id,
-                    },
-                    data:{
-                        indexed:true,
-                        description:JSON.stringify(parsedCollection.collectionDescription),
+                try {
+                    const {id,url,userId} = JSON.parse(message.content.toString());
+                    if (!id || !url || !userId) {
+                        throw new Error("Invalid message payload: missing required fields.");
                     }
-                })
-                console.log(`${id} - ${parsedCollection.collectionName}`);
-                channel.ack(message);
+                    const parsedCollection = await splitCollection(url,id,vectorStore,userId);
+                    await prismaClient.collection.update({
+                        where:{
+                            id,
+                        },
+                        data:{
+                            indexed:true,
+                            description:JSON.stringify(parsedCollection.collectionDescription),
+                        }
+                    })
+                    console.log(`${id} - ${parsedCollection.collectionName}`);
+                    channel.ack(message);   
+                } catch (error) {
+                    console.error("Error processing message:", error);
+                }
             }
         },{
             noAck: false

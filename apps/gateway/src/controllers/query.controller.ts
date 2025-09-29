@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import * as grpc from "@grpc/grpc-js";
 import { CollectionQueryRequest, CollectionQueryResponse, MediaServiceClient } from "@repo/proto/media";
 import { Request, Response } from "express";
+import { GrpcError } from "../utils/gRPC";
 dotenv.config();
 
 const mediaClient = new MediaServiceClient(
@@ -33,10 +34,11 @@ export const generateQueryResponse = async (req: Request, res: Response) => {
         res.end();
     });
 
-    call.on("error", (err: grpc.ServiceError) => {
+    call.on("error", async(err: grpc.ServiceError) => {
         console.error("gRPC error:", err);
         if (!res.headersSent) {
-            res.status(err.code ?? 500).json({ success: false, message: err.message });
+            const gRPCError = await GrpcError(err)
+            res.status(gRPCError.statusCode).json({success:false,message:gRPCError.message});
         } else {
             res.end();
         }
