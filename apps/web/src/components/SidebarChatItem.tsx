@@ -1,8 +1,8 @@
 "use client";
+import { Chat } from "@/store/useChatsStore";
 import { useChatTitleStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Chat } from "./SidebarChats";
 
 interface SidebarChatItemProps {
   chat: Chat;
