@@ -10,6 +10,8 @@ import {
 } from "@repo/proto/media";
 import prismaClient from "@repo/db/client";
 import amqp from "amqplib/callback_api";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -33,12 +35,13 @@ export const getPresignedUrl = async (
     }
 
     // Generate the presigned url.
-     const url = await s3.getSignedUrlPromise("putObject", {
-        Bucket: BUCKET_NAME,
-        Key: fileName,
-        ContentType: fileType,
-        Expires: 120, 
-      });
+    const command = new PutObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: fileName,
+      ContentType: fileType,
+    });
+
+    const url = await getSignedUrl(s3, command, { expiresIn: 120 });
 
     const response: GetPresignedUrlResponse = {
       message: "Presigned url generated successfully",
@@ -60,7 +63,7 @@ export const mediaUploaded = async (
   cb: grpc.sendUnaryData<MediaUploadedResponse>
 ) => {
   try {
-    const { fileName,authorId } = call.request;
+    const { fileName, authorId } = call.request;
 
     if (!fileName || !authorId) {
       return cb(
@@ -73,13 +76,13 @@ export const mediaUploaded = async (
     }
 
     const collection = await prismaClient.collection.create({
-      data:{
-        authorId:authorId,
-        title:fileName,
+      data: {
+        authorId: authorId,
+        title: fileName,
       }
     });
 
-    if(!collection) {
+    if (!collection) {
       return cb(
         {
           code: grpc.status.NOT_FOUND,
@@ -90,9 +93,9 @@ export const mediaUploaded = async (
     }
 
     const message = {
-      url:`https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
-      id:collection.id,
-      userId:authorId,
+      url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
+      id: collection.id,
+      userId: authorId,
     }
 
     // push the url into the queue to be consumed for indexing 
@@ -108,7 +111,7 @@ export const mediaUploaded = async (
         );
       }
 
-      connection.createChannel(function(error1,channel){
+      connection.createChannel(function (error1, channel) {
         if (error1) {
           console.error("RabbitMQ channel error:", error1);
           connection.close();
@@ -123,15 +126,15 @@ export const mediaUploaded = async (
 
         const queue = "collections";
 
-        channel.assertQueue(queue,{
-          durable:true,
+        channel.assertQueue(queue, {
+          durable: true,
         });
 
-        channel.sendToQueue(queue,Buffer.from(JSON.stringify(message)),{persistent:true});
+        channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), { persistent: true });
       });
       setTimeout(() => {
         try {
-            connection.close();
+          connection.close();
         } catch (closeErr) {
           console.warn("Failed to close RabbitMQ connection:", closeErr);
         }
@@ -158,7 +161,7 @@ export const deleteCollection = async (
   cb: grpc.sendUnaryData<DeleteCollectionResponse>
 ) => {
   try {
-    const { collectionId,authorId } = call.request;
+    const { collectionId, authorId } = call.request;
 
     if (!authorId || !collectionId) {
       return cb(
@@ -171,9 +174,9 @@ export const deleteCollection = async (
     }
 
     const collection = await prismaClient.collection.findUnique({
-      where:{
+      where: {
         authorId,
-        id:collectionId,
+        id: collectionId,
       }
     })
 
@@ -187,14 +190,16 @@ export const deleteCollection = async (
       );
     }
 
-    await s3.deleteObject({
-        Bucket:BUCKET_NAME,
-        Key:collection.title,
-    }).promise();
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: collection.title,
+      })
+    );
 
     await prismaClient.collection.delete({
-      where:{
-        id:collectionId,
+      where: {
+        id: collectionId,
       }
     });
 
