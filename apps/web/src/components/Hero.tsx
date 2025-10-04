@@ -73,7 +73,7 @@ export default function Hero() {
                     className="h-3 w-3 sm:h-3 md:w-5 md:h-5  transition-transform duration-300 ease-out group-hover:scale-110"
                   />
                   <p className="text-white text-sm transition-all duration-300 ease-out group-hover:block hidden">
-                    See Aurix in Action
+                    See Endlytic in Action
                   </p>
                 </div>
               </div>
