@@ -82,7 +82,7 @@ export const collectionQuery = async (
                 authorId,
                 chatId
             },
-            take: 4,
+            take: 6,
         })
 
         const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
@@ -95,22 +95,26 @@ export const collectionQuery = async (
         const context = await vectorStore.similaritySearch(query, 5,filter);
 
         interface LlmResponseSchema {
-            title?:string;
-            text?: string;
-            code?: {
-                language:string;
-                content:string;
-            };
-            table?:string;
-            chatId:string;
+            title: string | null;
+            text: string | null;
+            code: {
+                language: string;
+                content: string;
+            } | null;
+            table: {
+                headers: string[];
+                rows: { [key: string]: string }[];
+            } | null;
+            chatId: string;
         }
+
 
         const parser = new JsonOutputParser<LlmResponseSchema>();
 
-        const SYSTEM_PROMPT = `
-        You are an assistant that helps developers explore APIs through Postman collections or OpenAPI specs.  
-        You always use the provided **context** to answer. If the context lacks relevant info, clearly say so.  
-
+        const SYSTEM_PROMPT  = `
+        You are an expert AI assistant that helps developers explore APIs via Postman collections or OpenAPI specifications.  
+        Your goal is to provide precise, actionable answers strictly based on the provided context, using **modern best practices and up-to-date standards by default**.
+ 
         ## RULES
         1. **Detect user intent**:  
             - If the query asks for a **summary/overview** → fill "text" only.  
@@ -118,18 +122,15 @@ export const collectionQuery = async (
             - If the query references a specific **endpoint or method** → ALWAYS include "code" showing how to call that endpoint, in addition to "text" (and "table" if parameters apply).  
             - If the query explicitly asks for code → provide "code" plus supporting "text".  
             - If multiple forms are useful (e.g., explanation + code + table), include all.  
-
         2. Always set unused fields to "null". Do not omit them.   
-
-        3. **Code rules**:  
-            - Always generate runnable example code for endpoint queries.  
-            - Default to **JavaScript (Axios)** unless the user specifies another language.  
-            - Ensure the payload, headers, and URL exactly match the context (no hallucination). 
-        
+        3. **Code Guidelines**:
+            - Provide runnable code examples.
+            - Default to **JavaScript (Axios without config, use direct axios functions) with async/await** unless another language is explicitly requested.
+            - Also keep the same framework or technique as the last previous history, unless made my user to change.
+            - Ensure URL, payload, and headers exactly match the context.
         4. **Use context faithfully**:  
             - Never hallucinate endpoints or parameters not found in context.  
             - If information is missing, state it clearly in "text". 
-        
         5. **Chat Title**:  
             - If no Chat Title is provided → generate a concise, relevant title for the conversation.  
             - If a Chat Title is provided → return it unchanged. 
@@ -149,7 +150,33 @@ export const collectionQuery = async (
 
         const prompt = ChatPromptTemplate.fromTemplate(SYSTEM_PROMPT);
 
-        const formatInstructions = "Respond with a valid JSON object, containing three fields according to the situation: 'text' and 'code'(code with language and content) and 'table' and 'title'.";
+        const formatInstructions = `
+            Respond **ONLY** in JSON, following this exact schema:
+
+            {
+                "title": string | null,
+                "text": string | null,
+                "code": {
+                    "language": string,
+                    "content": string
+                } | null,
+                "table": {
+                    "headers": string[],
+                    "rows": { [key: string]: string }[]
+                } | null,
+                "chatId": string
+            }
+
+            1. Always include all fields. If a field is not relevant, set it to null.
+            2. Do NOT add any extra fields like 'content' or 'message'.
+            3. 'title' should be concise and relevant.
+            4. 'chatId' must always be set to the current chatId.
+            5. 'text' contains descriptive explanation if relevant.
+            6. 'code' contains example code if relevant, with 'language' and 'content'.
+            7. 'table' contains structured information if relevant, as a string.
+
+            Respond ONLY with JSON matching this schema. Do not add commentary outside JSON.
+            `;
 
         const partialedPrompt = await prompt.partial({
             format_instructions: formatInstructions,
