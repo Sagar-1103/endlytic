@@ -22,7 +22,7 @@ export default function Hero() {
         <div className="flex flex-col gap-y-7 w-[100%] xl:w-[80%] mx-auto relative">
           <div className="bg-[url(/landing-background.png)] mx-auto -z-10 bg-[length:200px_200px] md:bg-[length:325px_325px] w-full h-full bg-repeat absolute before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_center,_transparent_0%,_transparent_10%,_#07090e_100%)] before:pointer-events-none" />
           <p className="text-gray-400 text-lg sm:text-xl md:text-2xl lg:text-text-2xl xl:text-2xl mx-auto text-wrap w-[100%] sm:w-[90%] md:w-[83%] lg:w-[65%] xl:w-[53%]">
-            Upload your API spec or Postman collection to get instant insights
+            Upload your Postman collection to get instant insights
             and ready to use code snippets in multiple languages.
           </p>
 
@@ -65,7 +65,7 @@ export default function Hero() {
             </div>
 
             <div className="relative overflow-hidden z-10">
-              <div className="bg-gradient-to-b absolute from-transparent to-[#07090e] w-full h-full" />
+              <div className="bg-gradient-to-b absolute from-transparent from-0% via-[#07090e]/50 via-70% to-[#07090e] w-full h-full" />
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#2c2d31] p-2 md:p-3 cursor-pointer shadow-2xl shadow-gray-950 rounded-full group hover:scale-105 transition-all duration-300 ease-out">
                 <div className="rounded-full bg-[#414347] p-2 md:p-3 flex items-center gap-x-2 transition-all duration-300 ease-out group-hover:px-4">
                   <Play
@@ -78,11 +78,11 @@ export default function Hero() {
                 </div>
               </div>
               <Image
-                src={"/dashboard.avif"}
+                src={"/endlytic-dashboard.png"}
                 alt="dashboard"
                 width={2000}
                 height={2000}
-                className="object-cover"
+                className="object-cover rounded-2xl"
               />
             </div>
           </div>
