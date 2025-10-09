@@ -12,10 +12,10 @@ export default function Header() {
 
   const navlinks = [
     { id: 1, title: "Features", link: "#features" },
-    { id: 2, title: "About", link: "#" },
+    // { id: 2, title: "About", link: "#" },
     // { id: 3, title: "Pricing", link: "#" },
     { id: 4, title: "FAQ", link: "#faq" },
-    { id: 5, title: "Contact", link: "#" },
+    // { id: 5, title: "Contact", link: "#" },
   ];
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
