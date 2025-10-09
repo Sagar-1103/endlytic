@@ -4,19 +4,34 @@
 html {
   scroll-behavior: smooth;
 }
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+.custom-scrollbar,
+.custom-scrollbar pre {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(156, 163, 175, 0.6) transparent; /* Firefox */
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar,
+.custom-scrollbar pre::-webkit-scrollbar {
+  width: 4px;  /* vertical */
+  height: 4px; /* horizontal */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.custom-scrollbar pre::-webkit-scrollbar-thumb {
   background-color: rgba(156, 163, 175, 0.6);
   border-radius: 9999px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar pre::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+.custom-scrollbar pre::-webkit-scrollbar-track {
   background: transparent;
 }
+
 
 @custom-variant dark (&:is(.dark *));
 
