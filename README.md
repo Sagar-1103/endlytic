@@ -1,44 +1,42 @@
-# 🚀 Endlytic: Effortless API Understanding
+# Endlytic: Effortless API Understanding
 
 **Endlytic** is an AI powered platform that transforms Postman collections and API specifications into natural language answers and ready to use code snippets. It helps developers understand, test and integrate APIs instantly.
 
-**🌐 Live Site:** [https://endlytic.vercel.app](https://endlytic.vercel.app)
+**Live Site:** [https://endlytic.vercel.app](https://endlytic.vercel.app)
 
-## 📺 Demo
+## Demo
 https://github.com/user-attachments/assets/c0510294-5c74-429c-a511-8ed97438f29b
 
 
 
 
 
-## 🖼️ Application Preview
+## Application Preview
 
 <div align="center">
-  <h3>Landing Page</h3>
   <img src="./landing.png" alt="Landing Page" width="100%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <br/><br/>
-  <h3>Chat Interface</h3>
   <img src="./chat.jpg" alt="Chat Interface" width="100%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
 </div>
 
 
-## ✨ Features
+## Features
 
-- **🔍 Natural Language API Search**: Ask questions in plain English to find endpoints, parameters and request details.
-- **🤖 AI Teammate**: Turns complex API specs into clear, actionable answers.
-- **💻 Instant Code Generation**: Generate snippets in multiple languages (JS, Python, Go, etc.) directly from your collections.
-- **📂 Upload & Explore**: Easily import Postman collections to start chatting with your documentation.
-- **🚀 Turbo-Powered Monorepo**: Built for speed and scalability using Turborepo.
+- **Natural Language API Search**: Ask questions in plain English to find endpoints, parameters and request details.
+- **AI Teammate**: Turns complex API specs into clear, actionable answers.
+- **Instant Code Generation**: Generate snippets in multiple languages (JS, Python, Go, etc.) directly from your collections.
+- **Upload & Explore**: Easily import Postman collections to start chatting with your documentation.
+- **Turbo-Powered Monorepo**: Built for speed and scalability using Turborepo.
 
 
-## 🏗️ Architecture
+## Architecture
 
 Endlytic follows a modern Service Oriented Architecture (SOA) powered by gRPC for efficient internal communication.
 
 ![Architecture](./architecture.jpg)
 
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework**: Next.js 15 (App Router)
@@ -59,7 +57,7 @@ Endlytic follows a modern Service Oriented Architecture (SOA) powered by gRPC fo
 - **Database**: PostgreSQL with Prisma ORM
 
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to set up the project locally.
 
@@ -160,7 +158,7 @@ pnpm dev
 - **Gateway**: `http://localhost:3001`
 
 
-## 📦 Project Structure
+## Project Structure
 
 ```text
 .
