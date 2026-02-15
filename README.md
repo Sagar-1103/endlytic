@@ -2,6 +2,8 @@
 
 **Endlytic** is an AI powered platform that transforms Postman collections and API specifications into natural language answers and ready to use code snippets. It helps developers understand, test and integrate APIs instantly.
 
+**🌐 Live Site:** [https://endlytic.vercel.app](https://endlytic.vercel.app)
+
 ## 📺 Demo
 
 <video src="./demo.mp4" width="100%" controls></video>
