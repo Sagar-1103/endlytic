@@ -5,8 +5,9 @@
 **🌐 Live Site:** [https://endlytic.vercel.app](https://endlytic.vercel.app)
 
 ## 📺 Demo
+https://github.com/user-attachments/assets/c0510294-5c74-429c-a511-8ed97438f29b
 
-<video src="./demo.mp4" width="100%" controls></video>
+
 
 
 
