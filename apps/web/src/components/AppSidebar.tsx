@@ -25,11 +25,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { LogoutIcon, ProfileIcon, SettingIcon } from "@/lib/icons";
 
 export default function AppSidebar() {
+  const [user, setUser] = useState({ email: "", name: "", image: "" });
   const router = useRouter();
   const pathName = usePathname();
   const { setChatTitle } = useChatTitleStore();
-  const { setSettingModal ,settingModal } = settingModalStore();
-  const [user, setUser] = useState({ email: "", name: "", image: "" });
+  // const { setSettingModal, settingModal } = settingModalStore();
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout");
@@ -51,111 +51,111 @@ export default function AppSidebar() {
   }, []);
 
   return (
-      <Sidebar
-        side="left"
-        className="border-emerald-900/20"
-        variant="sidebar"
-        collapsible="offcanvas"
-      >
-        <SidebarContent className="bg-gradient-to-b from-[#0a0f0d] to-[#0d1210] text-white min-h-screen flex flex-col justify-between overflow-hidden">
-          <div className="px-4">
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu className="gap-y-1">
-                  <SidebarMenuItem>
-                    <Link href={"/chat"}>
-                      <div className="rounded-xl p-3">
-                        <div className="select-none cursor-pointer flex items-center gap-x-3">
-                          <div className="relative">
-                            <Image
-                              src={"/endlytic-dark.svg"}
-                              className="rounded-lg scale-200 transition-transform duration-300"
-                              alt="logo"
-                              width={28}
-                              height={28}
-                            />
-                          </div>
-                          <p className="text-xl font-bold bg-gradient-to-r from-emerald-300 to-emerald-400 bg-clip-text text-transparent">
-                            Endlytic
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </SidebarMenuItem>
-
-                  <Separator className="bg-emerald-900/30 mb-4" />
-
-                  {items.map((item, index) => (
-                    <SidebarItem
-                      onClick={() => {
-                        router.push(item.url);
-                        setChatTitle("Endlytic API Explorer");
-                      }}
-                      isActive={pathName === item.url}
-                      key={index}
-                      item={item}
-                    />
-                  ))}
-
-                  <SidebarChats />
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </div>
-
-          <SidebarFooter className="p-0">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div
-                      className="p-3 border-t border-emerald-900/20 bg-gradient-to-r from-[#0d1210] to-[#0a0f0d]"
-                    >
-                      <div className="p-3 flex items-center gap-3 hover:bg-emerald-500/10 rounded-xl transition-all duration-300 cursor-pointer group/footer border border-transparent hover:border-emerald-500/20">
+    <Sidebar
+      side="left"
+      className="border-emerald-900/20"
+      variant="sidebar"
+      collapsible="offcanvas"
+    >
+      <SidebarContent className="bg-gradient-to-b from-[#0a0f0d] to-[#0d1210] text-white min-h-screen flex flex-col justify-between overflow-hidden">
+        <div className="px-4">
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-y-1">
+                <SidebarMenuItem>
+                  <Link href={"/chat"}>
+                    <div className="rounded-xl p-3">
+                      <div className="select-none cursor-pointer flex items-center gap-x-3">
                         <div className="relative">
-                          {user.image ? (
-                            <Image
-                              src={user.image || "/endlytic.svg"}
-                              alt="User Avatar"
-                              width={36}
-                              height={36}
-                              className="rounded-full ring-2 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300"
-                            />
-                          ) : (
-                            <div className="rounded-full ring-2 w-7 h-7 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300">
-                              <p className="m-auto capitalize text-center">
-                                {user.email?.charAt(0)}
-                              </p>
-                            </div>
-                          )}
+                          <Image
+                            src={"/endlytic-dark.svg"}
+                            className="rounded-lg scale-200 transition-transform duration-300"
+                            alt="logo"
+                            width={28}
+                            height={28}
+                          />
                         </div>
-                        <div className="flex flex-col flex-1">
-                          <p className="text-sm font-medium text-slate-200 group-hover/footer:text-emerald-100 transition-colors duration-300">
-                            {user.name.length !== 0
-                              ? user.name.split(" ")[0]
-                              : user.email.split("@")[0]}
-                          </p>
-                          <p className="text-xs truncate w-24 text-slate-400 group-hover/footer:text-emerald-400 transition-colors duration-300">
-                            {user.email}
-                          </p>
-                        </div>
-                        <Settings className="w-4 h-4 text-slate-400 group-hover/footer:text-emerald-300 transition-all duration-300 group-hover/footer:rotate-90" />
+                        <p className="text-xl font-bold bg-gradient-to-r from-emerald-300 to-emerald-400 bg-clip-text text-transparent">
+                          Endlytic
+                        </p>
                       </div>
                     </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    side="top"
-                    className="w-[260px] bg-[#0E1A14] border border-[#1A2B22]/50 text-white"
+                  </Link>
+                </SidebarMenuItem>
+
+                <Separator className="bg-emerald-900/30 mb-4" />
+
+                {items.map((item, index) => (
+                  <SidebarItem
+                    onClick={() => {
+                      router.push(item.url);
+                      setChatTitle("Endlytic API Explorer");
+                    }}
+                    isActive={pathName === item.url}
+                    key={index}
+                    item={item}
+                  />
+                ))}
+
+                <SidebarChats />
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
+
+        <SidebarFooter className="p-0">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div
+                    className="p-3 border-t border-emerald-900/20 bg-gradient-to-r from-[#0d1210] to-[#0a0f0d]"
                   >
-                    <DropdownMenuItem className=" !text-[#E5E5E5] hover:!bg-[#0E1A14]">
-                      <div className=" flex flex-row gap-2"
-                        onClick={() => navigator.clipboard.writeText(user.email)}
-                      >
-                        <div className="flex items-center"><ProfileIcon /></div>
-                        <span className="text-sm mb-[2px]">{user.email}</span>
+                    <div className="p-3 flex items-center gap-3 hover:bg-emerald-500/10 rounded-xl transition-all duration-300 cursor-pointer group/footer border border-transparent hover:border-emerald-500/20">
+                      <div className="relative">
+                        {user.image ? (
+                          <Image
+                            src={user.image || "/endlytic.svg"}
+                            alt="User Avatar"
+                            width={36}
+                            height={36}
+                            className="rounded-full ring-2 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300"
+                          />
+                        ) : (
+                          <div className="rounded-full ring-2 w-7 h-7 ring-emerald-500/20 group-hover/footer:ring-emerald-500/40 transition-all duration-300">
+                            <p className="m-auto capitalize text-center">
+                              {user.email?.charAt(0)}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:!bg-[#22C55E]/10 !text-[#E5E5E5] hover:!text-emerald-300"
+                      <div className="flex flex-col flex-1">
+                        <p className="text-sm font-medium text-slate-200 group-hover/footer:text-emerald-100 transition-colors duration-300">
+                          {user.name.length !== 0
+                            ? user.name.split(" ")[0]
+                            : user.email.split("@")[0]}
+                        </p>
+                        <p className="text-xs truncate w-24 text-slate-400 group-hover/footer:text-emerald-400 transition-colors duration-300">
+                          {user.email}
+                        </p>
+                      </div>
+                      <Settings className="w-4 h-4 text-slate-400 group-hover/footer:text-emerald-300 transition-all duration-300 group-hover/footer:rotate-90" />
+                    </div>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[260px] bg-[#0E1A14] border border-[#1A2B22]/50 text-white"
+                >
+                  <DropdownMenuItem className=" !text-[#E5E5E5] hover:!bg-[#0E1A14]">
+                    <div className=" flex flex-row gap-2"
+                      onClick={() => navigator.clipboard.writeText(user.email)}
+                    >
+                      <div className="flex items-center"><ProfileIcon /></div>
+                      <span className="text-sm mb-[2px]">{user.email}</span>
+                    </div>
+                  </DropdownMenuItem>
+                  {/* <DropdownMenuItem className="hover:!bg-[#22C55E]/10 !text-[#E5E5E5] hover:!text-emerald-300"
                       onClick={() => { setSettingModal(!settingModal) 
                       }}
                     >
@@ -163,22 +163,22 @@ export default function AppSidebar() {
                         <div className="flex items-center"><SettingIcon /></div>
                         <span className="text-sm  mb-[2px]">Settings</span>
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:!bg-[#22C55E]/10 !text-[#E5E5E5] hover:!text-emerald-300">
-                      <div className=" flex flex-row gap-2"
-                        onClick={handleLogout}
-                      >
-                        <div className="flex items-center"><LogoutIcon /></div>
-                        <span className="text-sm mb-[2px]">Log out</span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </SidebarContent>
-      </Sidebar >
+                    </DropdownMenuItem> */}
+                  <DropdownMenuItem className="hover:!bg-[#22C55E]/10 !text-[#E5E5E5] hover:!text-emerald-300">
+                    <div className=" flex flex-row gap-2"
+                      onClick={handleLogout}
+                    >
+                      <div className="flex items-center"><LogoutIcon /></div>
+                      <span className="text-sm mb-[2px]">Log out</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </SidebarContent>
+    </Sidebar >
   );
 }
 

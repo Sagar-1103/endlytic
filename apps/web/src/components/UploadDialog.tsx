@@ -86,7 +86,7 @@ export function UploadDialog({ children }: UploadDialogProps) {
           router.refresh();
         }, 800);
         return `${file.name?.split(".postman_collection.json")?.[0]} uploaded successfully`;
-      })(),{
+      })(), {
       success: (msg) => msg,
       error: "Upload failed",
     }
@@ -134,11 +134,11 @@ export function UploadDialog({ children }: UploadDialogProps) {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={`flex flex-col items-center justify-center h-40 rounded-lg border-2 border-dashed cursor-pointer transition 
-              ${isDragging ? "border-green-500 bg-gray-700" :"bg-gray-800/50 border-gray-600 hover:bg-gray-700/50"}`}
+              ${isDragging ? "border-green-500 bg-gray-700" : "bg-gray-800/50 border-gray-600 hover:bg-gray-700/50"}`}
             >
               <Upload className="w-8 h-8 text-gray-400 mb-2" />
               <span className="text-gray-300 text-sm text-center">
-                 Click or drag a JSON file to upload here
+                Click or drag a JSON file to upload here
               </span>
               <input
                 id="file"
@@ -184,7 +184,7 @@ export function UploadDialog({ children }: UploadDialogProps) {
             <Button
               type="button"
               variant="secondary"
-              onClick={()=>{
+              onClick={() => {
                 setOpen(false);
                 setFile(null);
               }}

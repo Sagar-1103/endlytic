@@ -67,7 +67,7 @@ export default function Header() {
       <nav className="my-5 w-[90%] lg:w-[70%] mx-auto">
         <div className="flex justify-between w-full">
           {/* Brand */}
-          <div className="flex flex-row gap-x-1">
+          <Link href="/" className="flex flex-row gap-x-1">
             <Image
               src={"/endlytic-dark.svg"}
               className="rounded-sm scale-250"
@@ -78,7 +78,7 @@ export default function Header() {
             <p className="text-white my-auto font-semibold text-3xl">
               Endlytic
             </p>
-          </div>
+          </Link>
 
           {/* Links  */}
           <div className="text-white/70 hidden flex-row gap-x-6 sm:flex">
@@ -95,7 +95,7 @@ export default function Header() {
 
           {/* Buttons  */}
           <div className="my-auto">
-            <LoginButton/>
+            <LoginButton />
             {/* <Button
               className="sm:flex hidden cursor-pointer font-bold text-lg rounded-lg bg-white text-black hover:shadow-[inset_0_0_10px_1px_#ffffff,_0_0_50px_-10px_#00FFA6] hover:text-gray-800 hover:bg-[#00e593] transition-all duration-300 transform"
               variant={"default"}

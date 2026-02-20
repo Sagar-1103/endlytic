@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { importJWK, JWTPayload, jwtVerify } from "jose";
 import prismaClient from "lib/db";
-import { Plus } from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 
@@ -14,7 +14,7 @@ export default async function Chats() {
   let chats;
   const secret = process.env.JWT_SECRET || '';
   const jwk = await importJWK({ k: secret, alg: 'HS256', kty: 'oct' });
-  
+
   if (tokenFromCookie) {
     const { payload } = await jwtVerify(tokenFromCookie.value, jwk);
     userId = (payload as JWTPayload).id as string;
@@ -22,8 +22,8 @@ export default async function Chats() {
       where: {
         authorId: userId,
       },
-      orderBy:{
-        updatedAt:"desc",
+      orderBy: {
+        updatedAt: "desc",
       }
     });
   }
@@ -55,14 +55,41 @@ export default async function Chats() {
       </div>
 
       <div className="text-slate-300 text-xs sm:text-sm pl-1 sm:pl-2 my-3">
-        <p>{chats && chats.length ? chats.length : "No"} chats with Endlyptic</p>
+        <p>{chats && chats.length ? chats.length : "No"} chats with Endlytic</p>
       </div>
 
       <div className="text-white flex flex-col overflow-y-auto custom-scrollbar flex-1 gap-y-3">
-        {chats && chats.length !== 0 &&
+        {chats && chats.length !== 0 ? (
           chats.map((chat) => (
             <ChatRoomBox key={chat.id} {...chat} />
-          ))}
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            {/* Icon with glow */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-2xl scale-150" />
+              <div className="relative bg-gradient-to-br from-emerald-500/15 to-teal-500/10 border border-emerald-500/20 p-5 rounded-2xl">
+                <MessageSquare className="w-10 h-10 text-emerald-400/60" />
+              </div>
+            </div>
+
+            {/* Text */}
+            <h3 className="text-base font-semibold text-zinc-200 mb-2">No conversations yet</h3>
+            <p className="text-sm text-zinc-500 max-w-[260px] leading-relaxed mb-6">
+              Ask anything about your API collections and your chats will appear here.
+            </p>
+
+            {/* CTA */}
+            <Link href="/chat">
+              <Button className="cursor-pointer bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 shadow-[0_0_20px_-5px_rgba(16,185,129,0.4)] transition-all duration-300">
+                <div className="flex gap-x-2 items-center font-medium text-gray-100">
+                  <Plus className="w-4 h-4" />
+                  <p>Start your first chat</p>
+                </div>
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
