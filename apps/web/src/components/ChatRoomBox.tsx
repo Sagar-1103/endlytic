@@ -45,8 +45,8 @@ export default function ChatRoomBox(chat: ChatRoomBoxProps) {
         </span>
       </Link>
 
-      <DeleteDialog onConfirm={()=>handleDeleteChat(chat.id)} title="Delete Chat" description="Are you sure you want to delete this chat? All the messages in this chat will also be deleted permanently." >
-        <div className="absolute hidden group-hover:block top-4 sm:top-6 hover:bg-gray-600 p-1 rounded-sm right-3">
+      <DeleteDialog onConfirm={() => handleDeleteChat(chat.id)} title="Delete Chat" description="Are you sure you want to delete this chat? All the messages in this chat will also be deleted permanently." >
+        <div className="absolute flex sm:hidden sm:group-hover:flex top-4 sm:top-6 hover:bg-gray-600 p-1 rounded-sm right-3">
           <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 hover:text-red-400 group-hover:text-gray-400" />
         </div>
       </DeleteDialog>

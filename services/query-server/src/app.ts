@@ -11,9 +11,9 @@ import prismaClient from "@repo/db/client";
 dotenv.config()
 
 const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
-  temperature: 0,
-  apiKey: process.env.GEMINI_API_KEY,
+    model: "gemini-2.5-flash",
+    temperature: 0,
+    apiKey: process.env.GEMINI_API_KEY,
 });
 
 const embeddings = new GoogleGenerativeAIEmbeddings({
@@ -42,8 +42,8 @@ export const collectionQuery = async (
         }
 
         const collection = await prismaClient.collection.findUnique({
-            where:{
-                id:collectionId
+            where: {
+                id: collectionId
             }
         });
 
@@ -57,15 +57,15 @@ export const collectionQuery = async (
         }
 
         let chat = await prismaClient.chat.upsert({
-            where:{
-                id:chatId,
-                authorId:authorId,
+            where: {
+                id: chatId,
+                authorId: authorId,
             },
-            create:{
-                id:chatId,
-                authorId:authorId,
+            create: {
+                id: chatId,
+                authorId: authorId,
             },
-            update:{ }
+            update: {}
         });
 
         if (!chat) {
@@ -78,7 +78,7 @@ export const collectionQuery = async (
         }
 
         const history = await prismaClient.message.findMany({
-            where:{
+            where: {
                 authorId,
                 chatId
             },
@@ -90,9 +90,9 @@ export const collectionQuery = async (
             maxConcurrency: 5,
         });
 
-        const filter = { collectionId,userId:authorId }; 
+        const filter = { collectionId, userId: authorId };
 
-        const context = await vectorStore.similaritySearch(query, 5,filter);
+        const context = await vectorStore.similaritySearch(query, 5, filter);
 
         interface LlmResponseSchema {
             title: string | null;
@@ -111,7 +111,7 @@ export const collectionQuery = async (
 
         const parser = new JsonOutputParser<LlmResponseSchema>();
 
-        const SYSTEM_PROMPT  = `
+        const SYSTEM_PROMPT = `
         You are an expert AI assistant that helps developers explore APIs via Postman collections or OpenAPI specifications.  
         Your goal is to provide precise, actionable answers strictly based on the provided context, using **modern best practices and up-to-date standards by default**.
  
@@ -180,45 +180,45 @@ export const collectionQuery = async (
 
         const partialedPrompt = await prompt.partial({
             format_instructions: formatInstructions,
-            chat_history:JSON.stringify(history),
-            context:JSON.stringify(context)
+            chat_history: JSON.stringify(history),
+            context: JSON.stringify(context)
         });
 
         const chain = partialedPrompt.pipe(model).pipe(parser);
         let result;
-        for await (const s of await chain.stream({query,description:collection.description,chatTitle:chat?.title })) {
-            s.chatId=chat.id;
+        for await (const s of await chain.stream({ query, description: collection.description, chatTitle: chat?.title })) {
+            s.chatId = chat.id;
             const response: CollectionQueryResponse = {
-                jsonData:JSON.stringify(s)
+                jsonData: JSON.stringify(s)
             };
             call.write(response);
             result = s;
         }
 
-        if(!chat.title) {
+        if (!chat.title) {
             await prismaClient.chat.update({
-                where:{
-                    id:chat?.id
+                where: {
+                    id: chat?.id
                 },
-                data:{
-                    title:result?.title
+                data: {
+                    title: result?.title
                 }
             })
         }
 
         await prismaClient.message.createMany({
-            data:[
+            data: [
                 {
-                    role:"User",
-                    content:JSON.stringify({text:query}),
-                    authorId:authorId,
-                    chatId:chat.id
+                    role: "User",
+                    content: JSON.stringify({ text: query }),
+                    authorId: authorId,
+                    chatId: chat.id
                 },
                 {
-                    role:"Ai",
-                    content:JSON.stringify(result),
-                    authorId:authorId,
-                    chatId:chat.id
+                    role: "Ai",
+                    content: JSON.stringify(result),
+                    authorId: authorId,
+                    chatId: chat.id
                 }
             ]
         })
