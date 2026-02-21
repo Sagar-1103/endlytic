@@ -97,15 +97,17 @@ export default function ChatBox() {
         done = readerDone;
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
+          console.log("Chunk Length: ", chunk.length);
+
           addMessage("Ai", chunk);
           try {
             result = JSON.parse(chunk);
-            if(!newChatCreated && result && result.title) {
+            if (!newChatCreated && result && result.title) {
               newChatCreated = true;
-              addChat(chatId,result.title);
+              addChat(chatId, result.title);
               setChatTitle(result.title);
             }
-            
+
           } catch (error) {
             console.log("error parsing chunk");
           }

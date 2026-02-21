@@ -9,9 +9,9 @@ export default function AiChat({ content }: { content: any }) {
    return (
       <div className="flex flex-col rounded-2xl mr-auto text-[#FAFAFA] w-fit max-w-[85%] md:max-w-[60%]">
          <div className="px-4 py-1.5">
-                     {content.text && <TextResponse value={content.text} />}
-                     {content.code && <CodeResponse code={content.code} />}
-                     {content.table && <TableResponse headers={content.table.headers} rows={content.table.rows} />}
+            {content.text && <TextResponse value={content.text} />}
+            {content.code && <CodeResponse code={content.code} />}
+            {content.table && <TableResponse headers={content.table.headers} rows={content.table.rows} />}
             {/* {exampleChat.map((res, i) => (
                <div key={i}>
                   {(() => {
