@@ -92,25 +92,44 @@ export default function ChatBox() {
       let done = false;
       let newChatCreated = false;
       let result;
+      let buffer = "";
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
-          const chunk = decoder.decode(value, { stream: true });
-          console.log("Chunk Length: ", chunk.length);
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
 
-          addMessage("Ai", chunk);
-          try {
-            result = JSON.parse(chunk);
-            if (!newChatCreated && result && result.title) {
-              newChatCreated = true;
-              addChat(chatId, result.title);
-              setChatTitle(result.title);
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+
+            addMessage("Ai", trimmed);
+            try {
+              result = JSON.parse(trimmed);
+              if (!newChatCreated && result && result.title) {
+                newChatCreated = true;
+                addChat(chatId, result.title);
+                setChatTitle(result.title);
+              }
+            } catch (error) {
+              console.log("error parsing chunk:", error);
             }
-
-          } catch (error) {
-            console.log("error parsing chunk");
           }
+        }
+      }
+      if (buffer.trim()) {
+        addMessage("Ai", buffer.trim());
+        try {
+          result = JSON.parse(buffer.trim());
+          if (!newChatCreated && result && result.title) {
+            newChatCreated = true;
+            addChat(chatId, result.title);
+            setChatTitle(result.title);
+          }
+        } catch (error) {
+          console.log("error parsing final chunk:", error);
         }
       }
 

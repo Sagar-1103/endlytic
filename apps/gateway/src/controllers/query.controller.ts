@@ -13,13 +13,13 @@ const mediaClient = new MediaServiceClient(
 
 export const generateQueryResponse = async (req: Request, res: Response) => {
     const { query, collectionId, chatId } = req.body;
-    const authorId = req.userId; 
+    const authorId = req.userId;
 
     if (!collectionId || !query || !authorId) {
         return res.status(401).json({ success: false, message: "Missing required fields" });
     }
 
-    const requestData: CollectionQueryRequest = { collectionId: collectionId as string, authorId:authorId as string, query: query as string,chatId };
+    const requestData: CollectionQueryRequest = { collectionId: collectionId as string, authorId: authorId as string, query: query as string, chatId };
 
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.setHeader("Transfer-Encoding", "chunked");
@@ -27,20 +27,20 @@ export const generateQueryResponse = async (req: Request, res: Response) => {
     const call = mediaClient.collectionQuery(requestData);
 
     call.on("data", (response: CollectionQueryResponse) => {
-        res.write(response.jsonData);
+        res.write(response.jsonData + "\n");
     });
 
     call.on("end", () => {
         res.end();
     });
 
-    call.on("error", async(err: grpc.ServiceError) => {
+    call.on("error", async (err: grpc.ServiceError) => {
         console.error("gRPC error:", err);
         if (!res.headersSent) {
             const gRPCError = await GrpcError(err)
-            res.status(gRPCError.statusCode).json({success:false,message:gRPCError.message});
+            res.status(gRPCError.statusCode).json({ success: false, message: gRPCError.message });
         } else {
             res.end();
         }
-  });
+    });
 }
