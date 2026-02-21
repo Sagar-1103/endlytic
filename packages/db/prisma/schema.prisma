@@ -22,6 +22,7 @@ model Collection {
   id          String @id @default(uuid())
   title       String
   description String?
+  url         String?
   indexed     Boolean @default(false)
   authorId    String
   createdAt   DateTime @default(now())

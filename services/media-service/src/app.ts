@@ -75,10 +75,13 @@ export const mediaUploaded = async (
       );
     }
 
+    const s3Url = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
     const collection = await prismaClient.collection.create({
       data: {
         authorId: authorId,
         title: fileName,
+        url: s3Url,
       }
     });
 
@@ -99,7 +102,7 @@ export const mediaUploaded = async (
     }
 
     // push the url into the queue to be consumed for indexing 
-    amqp.connect(rabbitMqUrl,function(error0,connection){
+    amqp.connect(rabbitMqUrl, function (error0, connection) {
       if (error0) {
         console.log("RabbitMQ connection error:", error0);
         return cb(
