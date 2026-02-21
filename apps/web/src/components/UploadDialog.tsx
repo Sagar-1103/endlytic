@@ -116,30 +116,39 @@ export function UploadDialog({ children }: UploadDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-[#1a201c] text-gray-100 border border-gray-900">
+      <DialogContent className="sm:max-w-md bg-gradient-to-b from-[#0a0f0d] to-[#0d1210] text-[#e2e8f0] border border-emerald-900/30 shadow-2xl shadow-emerald-900/10">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-emerald-300">
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-300 to-emerald-400 bg-clip-text text-transparent">
             Upload JSON File
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Only JSON files are supported.
+          <DialogDescription className="text-slate-400 font-medium">
+            Select or drag your Postman collection JSON file here.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 mt-4">
+        <div className="flex flex-col gap-4 mt-2">
           {!file ? (
             <label
               htmlFor="file"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`flex flex-col items-center justify-center h-40 rounded-lg border-2 border-dashed cursor-pointer transition 
-              ${isDragging ? "border-green-500 bg-gray-700" : "bg-gray-800/50 border-gray-600 hover:bg-gray-700/50"}`}
+              className={`flex flex-col items-center justify-center min-h-[160px] rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer group
+              ${isDragging
+                  ? "border-emerald-500 bg-emerald-500/10 scale-[1.02]"
+                  : "bg-[#0b110f] border-emerald-900/30 hover:border-emerald-500/50 hover:bg-emerald-500/5"}`}
             >
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <span className="text-gray-300 text-sm text-center">
-                Click or drag a JSON file to upload here
-              </span>
+              <div className="p-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300 mb-3">
+                <Upload className="w-8 h-8 text-emerald-400" />
+              </div>
+              <div className="text-center px-4">
+                <p className="text-slate-200 font-semibold mb-1">
+                  Click or drag file to upload
+                </p>
+                <p className="text-emerald-500/60 text-xs">
+                  Supported format: .json
+                </p>
+              </div>
               <input
                 id="file"
                 type="file"
@@ -149,58 +158,66 @@ export function UploadDialog({ children }: UploadDialogProps) {
               />
             </label>
           ) : (
-            <div className="flex items-center justify-between bg-gray-800 p-3 rounded-lg sm:max-w-[400px]">
-              <div className="flex items-center gap-2 truncate">
-                <span className="hidden sm:block px-2 py-1 text-xs rounded bg-green-700 text-white">
+            <div className="flex items-center justify-between bg-[#0b110f] border border-emerald-500/20 p-4 rounded-xl shadow-inner shadow-emerald-900/20">
+              <div className="flex items-center gap-3 truncate">
+                <div className="px-2 py-1 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                   JSON
+                </div>
+                <span className="text-sm font-medium text-slate-200 truncate max-w-[200px]">
+                  {file.name}
                 </span>
-                <span className="max-w-[58vw] sm:max-w-xs text-gray-200">{file.name}</span>
               </div>
               <Button
                 variant="ghost"
-                size="sm"
-                className="text-gray-200 cursor-pointer hover:!bg-gray-400 "
+                size="icon"
+                className="h-8 w-8 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
                 onClick={() => setFile(null)}
               >
-                <X size={20} />
+                <X size={18} />
               </Button>
             </div>
           )}
 
           {uploading && (
-            <div>
+            <div className="space-y-2 px-2">
+              <div className="flex justify-between text-xs font-medium text-slate-400">
+                <span>Uploading collection...</span>
+                <span className="text-emerald-400">{progress}%</span>
+              </div>
               <Progress
                 value={progress}
-                className="w-full h-2 bg-gray-700 [&>div]:bg-green-500"
+                className="w-full h-1.5 bg-[#0b110f] border border-emerald-900/30 [&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:to-emerald-300 transition-all duration-300"
               />
-              <p className="text-xs text-gray-400 mt-1">Uploading… {progress}%</p>
             </div>
           )}
         </div>
 
-
-        <DialogFooter className="sm:justify-end mt-6 sm:max-w-[400px]">
+        <DialogFooter className="sm:justify-end gap-3 mt-4">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={() => {
                 setOpen(false);
                 setFile(null);
               }}
-              className="bg-gray-700 cursor-pointer text-gray-200 hover:bg-gray-600"
+              className="border-emerald-900/30 bg-[#0b110f] text-slate-400 hover:text-slate-200 hover:bg-emerald-900/30 hover:border-emerald-500/30 transition-all duration-300"
             >
-              Close
+              Cancel
             </Button>
           </DialogClose>
           <Button
             type="button"
             disabled={!file || uploading}
             onClick={handleUpload}
-            className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-500 cursor-pointer"
+            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold shadow-lg shadow-emerald-500/10 border-t border-white/10 active:scale-95 transition-all duration-300 px-6"
           >
-            <Upload size={18} />
-            {uploading ? "Uploading..." : "Upload"}
+            {uploading ? (
+              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <Upload size={18} />
+            )}
+            {uploading ? "Uploading..." : "Upload Collection"}
           </Button>
         </DialogFooter>
       </DialogContent>

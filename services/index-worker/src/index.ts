@@ -9,9 +9,9 @@ import { TaskType } from "@google/generative-ai";
 dotenv.config();
 
 const embeddings = new GoogleGenerativeAIEmbeddings({
-  model: "text-embedding-004",
-  taskType: TaskType.RETRIEVAL_DOCUMENT,
-  apiKey:process.env.GEMINI_API_KEY,
+    model: "gemini-embedding-001",
+    taskType: TaskType.RETRIEVAL_DOCUMENT,
+    apiKey: process.env.GEMINI_API_KEY,
 });
 
 const pinecone = new PineconeClient();
@@ -19,20 +19,20 @@ const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX!);
 
 const rabbitMqUrl = process.env.RABBITMQ_URL || "amqp://localhost";
 
-amqp.connect(rabbitMqUrl,function(error0:Error,connection:Connection) {
-    if(error0){
+amqp.connect(rabbitMqUrl, function (error0: Error, connection: Connection) {
+    if (error0) {
         console.error("Failed to connect RabbitMQ:", error0.message);
         process.exit(1);
     }
-    connection.createChannel(async function(error1,channel) {
-        if(error1){
+    connection.createChannel(async function (error1, channel) {
+        if (error1) {
             console.error("Failed to create RabbitMQ channel:", error1.message);
             process.exit(1);
         }
         const queue = "collections";
 
-        channel.assertQueue(queue,{
-            durable:true
+        channel.assertQueue(queue, {
+            durable: true
         });
 
         channel.prefetch(1);
@@ -41,38 +41,38 @@ amqp.connect(rabbitMqUrl,function(error0:Error,connection:Connection) {
         let vectorStore;
         try {
             vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
-            pineconeIndex,
-            maxConcurrency: 5,
-        });
-        } catch (error:any) {
-          console.error("[Pinecone] Failed to initialize vector store:", error.message);
-          process.exit(1);
+                pineconeIndex,
+                maxConcurrency: 5,
+            });
+        } catch (error: any) {
+            console.error("[Pinecone] Failed to initialize vector store:", error.message);
+            process.exit(1);
         }
 
-        channel.consume(queue,async function(message){
-            if(message){
+        channel.consume(queue, async function (message) {
+            if (message) {
                 try {
-                    const {id,url,userId} = JSON.parse(message.content.toString());
+                    const { id, url, userId } = JSON.parse(message.content.toString());
                     if (!id || !url || !userId) {
                         throw new Error("Invalid message payload: missing required fields.");
                     }
-                    const parsedCollection = await splitCollection(url,id,vectorStore,userId);
+                    const parsedCollection = await splitCollection(url, id, vectorStore, userId);
                     await prismaClient.collection.update({
-                        where:{
+                        where: {
                             id,
                         },
-                        data:{
-                            indexed:true,
-                            description:JSON.stringify(parsedCollection.collectionDescription),
+                        data: {
+                            indexed: true,
+                            description: JSON.stringify(parsedCollection.collectionDescription),
                         }
                     })
                     console.log(`${id} - ${parsedCollection.collectionName}`);
-                    channel.ack(message);   
+                    channel.ack(message);
                 } catch (error) {
                     console.error("Error processing message:", error);
                 }
             }
-        },{
+        }, {
             noAck: false
         })
     })
