@@ -10,6 +10,7 @@ interface ChatsState {
     getChats: () => void;
     addChat: (id: string, title: string) => void;
     deleteChat: (id: string) => void;
+    updateChatTitle: (id: string, title: string) => void;
 }
 
 
@@ -32,6 +33,14 @@ export const useChatsStore = create<ChatsState>((set) => ({
             const filteredChats = state.chats.filter((chat) => chat.id !== id);
             return { chats: filteredChats }
         });
+    },
+
+    updateChatTitle: (id: string, title: string) => {
+        set((state) => ({
+            chats: state.chats.map((chat) =>
+                chat.id === id ? { ...chat, title } : chat
+            ),
+        }));
     },
     getChats: async () => {
         try {

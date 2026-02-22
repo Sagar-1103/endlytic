@@ -51,7 +51,7 @@ export function DeleteDialog({
           <Button
             variant="destructive"
             className="bg-red-600/90 hover:bg-red-600 text-white font-bold shadow-lg shadow-red-900/20 active:scale-95 transition-all duration-300 cursor-pointer"
-            onClick={onConfirm}
+            onClick={() => { setOpen(false); onConfirm?.(); }}
           >
             Delete
           </Button>

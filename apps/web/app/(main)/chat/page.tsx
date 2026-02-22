@@ -20,7 +20,7 @@ export default function Page() {
     },
     {
       title: "Developer Productivity",
-      description: "Save, share and reuse queries, export as cURL and use directly into your IDE.",
+      description: "Save and revisit past conversations, reuse queries and speed up your API development workflow.",
     },
   ];
 
@@ -45,7 +45,7 @@ export default function Page() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl w-full mb-16 pb-52 sm:pb-40">
         {features.map((feature) => (
-          <div 
+          <div
             key={feature.title}
             className="bg-[#0f1411] border border-gray-700 rounded-xl p-3 text-center hover:scale-103 hover:shadow-xl transition-transform duration-300 cursor-default"
           >

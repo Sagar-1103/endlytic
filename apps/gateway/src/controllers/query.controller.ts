@@ -21,8 +21,11 @@ export const generateQueryResponse = async (req: Request, res: Response) => {
 
     const requestData: CollectionQueryRequest = { collectionId: collectionId as string, authorId: authorId as string, query: query as string, chatId };
 
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
+    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
 
     const call = mediaClient.collectionQuery(requestData);
 

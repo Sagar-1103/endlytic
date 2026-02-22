@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { ArrowUpCircle, Mic, Paperclip } from "lucide-react";
 import RadioGroup from "./CollectionRadioGroup";
@@ -20,6 +20,7 @@ export default function ChatBox() {
   const { setIsStreaming } = useIsStreamingStore();
   const [listening, setListening] = useState(false);
   const [recognition, setRecognition] = useState<any | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     // Setup speech recognition
@@ -37,8 +38,9 @@ export default function ChatBox() {
 
     recog.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
-      setChatInput(transcript); // <-- update your input
+      setChatInput(transcript);
       setListening(false);
+      setTimeout(() => textareaRef.current?.focus(), 0);
     };
 
     recog.onerror = () => {
@@ -147,8 +149,15 @@ export default function ChatBox() {
       <div className="pb-4 w-[88%] sm:w-[80%] max-w-[75rem] sm:mx-auto  bg-[#0f1411]">
         <div className="w-full w-min-[0] border-2 border-emerald-900/20 bg-[#161f19] mx-auto rounded-2xl p-3">
           <Textarea
+            ref={textareaRef}
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
             className="border-none focus-visible:ring-0 resize-none outline-none text-white placeholder-gray-400 w-full md:text-md max-h-[250px] overflow-y-auto custom-scrollbar"
             placeholder="Ask me anything about your API..."
           />
