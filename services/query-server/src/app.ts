@@ -137,7 +137,7 @@ export const collectionQuery = async (
         NEVER generate plain Node.js/Axios code when the user asked for a specific framework or language.
 
         === Next.js (App Router) ===
-        - Use native fetch with Next.js cache options: fetch(url, { cache: 'no-store' }) or fetch(url, { next: { revalidate: 60 } }).
+        - Use native fetch with Next.js cache options: fetch(url, {{ cache: 'no-store' }}) or fetch(url, {{ next: {{ revalidate: 60 }} }}).
         - Server Components: write async function components. Add comment: // Server Component.
         - Client Components: add 'use client' directive, use useState + useEffect or TanStack Query.
         - API Route Handlers: export async function GET/POST in app/api/... files.
@@ -148,8 +148,8 @@ export const collectionQuery = async (
         - Client-side: useEffect + useState with Axios. Include TypeScript types.
 
         === TanStack Query (React Query) ===
-        - GET requests → useQuery({ queryKey: [...], queryFn: async () => { ... } }).
-        - POST/PUT/PATCH/DELETE → useMutation({ mutationFn: async (data) => { ... }, onSuccess, onError }).
+        - GET requests → useQuery({{ queryKey: [...], queryFn: async () => {{ ... }} }}).
+        - POST/PUT/PATCH/DELETE → useMutation({{ mutationFn: async (data) => {{ ... }}, onSuccess, onError }}).
         - Always show the full React component that uses the hook, including isLoading / isError / data handling.
         - Use Axios as the fetcher function inside queryFn/mutationFn.
         - Include QueryClientProvider at the root if showing a standalone example.
@@ -223,7 +223,6 @@ export const collectionQuery = async (
         ## FORMAT
         Format: {format_instructions}
         `;
-
 
         const prompt = ChatPromptTemplate.fromTemplate(SYSTEM_PROMPT);
 
