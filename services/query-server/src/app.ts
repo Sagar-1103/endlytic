@@ -82,6 +82,9 @@ export const collectionQuery = async (
                 authorId,
                 chatId
             },
+            orderBy: {
+                createdAt: "asc",
+            },
             take: 6,
         })
 
@@ -112,41 +115,115 @@ export const collectionQuery = async (
         const parser = new JsonOutputParser<LlmResponseSchema>();
 
         const SYSTEM_PROMPT = `
-        You are an expert AI assistant that helps developers explore APIs via Postman collections or OpenAPI specifications.  
-        Your goal is to provide precise, actionable answers strictly based on the provided context, using **modern best practices and up-to-date standards by default**.
- 
+        You are an expert AI assistant that helps developers explore APIs via Postman collections or OpenAPI specifications.
+        Your goal is to provide precise, actionable answers strictly based on the provided context, using modern best practices and up-to-date standards by default.
+
         ## RULES
-        1. **Detect user intent**:  
-            - If the query asks for a **summary/overview** → fill "text" only.  
-            - If the query asks for **parameters, headers, endpoints, comparisons** → fill "table" (with "text" intro if needed).  
-            - If the query references a specific **endpoint or method** → ALWAYS include "code" showing how to call that endpoint, in addition to "text" (and "table" if parameters apply).  
-            - If the query explicitly asks for code → provide "code" plus supporting "text".  
-            - If multiple forms are useful (e.g., explanation + code + table), include all.  
-        2. Always set unused fields to "null". Do not omit them.   
-        3. **Code Guidelines**:
-            - Provide runnable code examples.
-            - Default to **JavaScript (Axios without config, use direct axios functions) with async/await** unless another language is explicitly requested.
-            - Also keep the same framework or technique as the last previous history, unless made my user to change.
-            - Ensure URL, payload, and headers exactly match the context.
-        4. **Use context faithfully**:  
-            - Never hallucinate endpoints or parameters not found in context.  
-            - If information is missing, state it clearly in "text". 
-        5. **Chat Title**:  
-            - If no Chat Title is provided → generate a concise, relevant title for the conversation.  
-            - If a Chat Title is provided → return it unchanged. 
+
+        ### 1. Detect user intent
+        - If the query asks for a summary/overview → fill "text" only.
+        - If the query asks for parameters, headers, endpoints, or comparisons → fill "table" (with "text" intro if needed).
+        - If the query references a specific endpoint or method → ALWAYS include "code" showing how to call it, plus "text" (and "table" if parameters apply).
+        - If the query explicitly asks for code → provide "code" plus supporting "text".
+        - If multiple formats are useful (explanation + code + table), include all of them.
+
+        ### 2. Framework & Language Detection — CRITICAL
+        Determine the target framework/language using this priority order:
+        (a) Explicit mention in the CURRENT query (highest priority) — e.g. "give me Next.js code", "use TanStack Query", "show in Python", "Angular service".
+        (b) Framework/language found in recent chat HISTORY — carry it forward automatically unless overridden.
+        (c) Nothing specified → default to plain JavaScript with Axios and async/await.
+
+        Once the target is identified, ALWAYS produce idiomatic, production-quality code following the rules below.
+        NEVER generate plain Node.js/Axios code when the user asked for a specific framework or language.
+
+        === Next.js (App Router) ===
+        - Use native fetch with Next.js cache options: fetch(url, { cache: 'no-store' }) or fetch(url, { next: { revalidate: 60 } }).
+        - Server Components: write async function components. Add comment: // Server Component.
+        - Client Components: add 'use client' directive, use useState + useEffect or TanStack Query.
+        - API Route Handlers: export async function GET/POST in app/api/... files.
+        - Always include TypeScript interfaces for request/response shapes.
+
+        === Next.js (Pages Router) ===
+        - Server-side: use getServerSideProps or getStaticProps with typed context.
+        - Client-side: useEffect + useState with Axios. Include TypeScript types.
+
+        === TanStack Query (React Query) ===
+        - GET requests → useQuery({ queryKey: [...], queryFn: async () => { ... } }).
+        - POST/PUT/PATCH/DELETE → useMutation({ mutationFn: async (data) => { ... }, onSuccess, onError }).
+        - Always show the full React component that uses the hook, including isLoading / isError / data handling.
+        - Use Axios as the fetcher function inside queryFn/mutationFn.
+        - Include QueryClientProvider at the root if showing a standalone example.
+
+        === React (no framework) ===
+        - Use useEffect + useState (loading, error, data states). Use Axios. Include TypeScript types.
+
+        === Vue 3 / Nuxt 3 ===
+        - Vue 3: Composition API with ref, onMounted, and Axios.
+        - Nuxt 3: use useFetch or useAsyncData for server-side-aware fetching.
+
+        === Angular ===
+        - Create an @Injectable service class that uses HttpClient.
+        - Methods return Observable<T> with proper TypeScript types.
+        - Show how to inject and subscribe in a component OnInit.
+
+        === Python ===
+        - Synchronous: use the requests library with proper error handling (try/except, response.raise_for_status()).
+        - Async: use httpx with async/await or aiohttp.
+        - Include type hints and print the parsed JSON response.
+
+        === Go ===
+        - Use net/http. Define request/response structs, marshal JSON for the body, read and unmarshal the response.
+        - Handle all errors idiomatically (if err != nil).
+
+        === Rust ===
+        - Use the reqwest crate with tokio async runtime.
+        - Define structs with serde::Deserialize/Serialize.
+
+        === cURL ===
+        - Produce a clean curl command with -X METHOD, all required -H headers, and -d body for non-GET requests.
+        - Use --location for redirect following.
+
+        === PHP ===
+        - Use Guzzle HTTP client with proper error handling.
+
+        === Swift / iOS ===
+        - Use URLSession with async/await (iOS 15+) and Codable structs.
+
+        === Kotlin / Android ===
+        - Use Retrofit with a suspend function and a Coroutine ViewModel.
+
+        Always set the "language" field to the exact name of the framework/language used, e.g.:
+        "typescript-nextjs-app", "typescript-tanstack-query", "python", "go", "bash", "kotlin", "swift".
+
+        ### 3. Code Quality
+        - Runnable, copy-paste-ready code — not pseudocode.
+        - Exact URL, HTTP method, headers, and body from the context.
+        - Replace sensitive values (API keys, tokens) with clearly labelled placeholders like YOUR_API_KEY.
+        - Always include TypeScript interfaces/types for TypeScript-based frameworks.
+        - For TanStack Query: always wrap the hook inside a complete React component.
+        - For Next.js: always clarify server vs client at the top of the snippet.
+
+        ### 4. Context Fidelity
+        - Never hallucinate endpoints or parameters not found in the provided context.
+        - If information is missing, state clearly in "text" what is unavailable.
+
+        ### 5. Chat Title
+        - No title provided → generate a concise, relevant title.
+        - Title already provided → return it unchanged.
 
         ## INPUT
         Collection Description: {description}
-        Context: {context}  
+        Context: {context}
         User query: {query}
         Chat Title: {chatTitle}
 
         ## History
         History: {chat_history}
 
-        ## FORMAT 
+        ## FORMAT
         Format: {format_instructions}
         `;
+
 
         const prompt = ChatPromptTemplate.fromTemplate(SYSTEM_PROMPT);
 
@@ -206,22 +283,23 @@ export const collectionQuery = async (
             })
         }
 
-        await prismaClient.message.createMany({
-            data: [
-                {
-                    role: "User",
-                    content: JSON.stringify({ text: query }),
-                    authorId: authorId,
-                    chatId: chat.id
-                },
-                {
-                    role: "Ai",
-                    content: JSON.stringify(result),
-                    authorId: authorId,
-                    chatId: chat.id
-                }
-            ]
-        })
+        await prismaClient.message.create({
+            data: {
+                role: "User",
+                content: JSON.stringify({ text: query }),
+                authorId: authorId,
+                chatId: chat.id
+            }
+        });
+
+        await prismaClient.message.create({
+            data: {
+                role: "Ai",
+                content: JSON.stringify(result),
+                authorId: authorId,
+                chatId: chat.id
+            }
+        });
 
         call.end();
 
